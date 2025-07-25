@@ -21,6 +21,8 @@ export interface DailyMetric {
 	low: number;
 	close: number;
 	volume: number;
+	trades: number;
 	performance: number; // Daily % change
 	volatility: number; // Daily range %
+	liquidity: number; // Turnover
 }

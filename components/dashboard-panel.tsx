@@ -1,6 +1,6 @@
-// src/components/dashboard-panel.tsx
 "use client";
 
+import { DailyMetric } from "@/lib/types";
 import {
 	Sheet,
 	SheetContent,
@@ -8,139 +8,131 @@ import {
 	SheetTitle,
 	SheetDescription,
 } from "@/components/ui/sheet";
-import {
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	ResponsiveContainer,
-	LabelList,
-} from "recharts";
-import { DailyMetric } from "@/lib/types";
+import { format } from "date-fns";
+import { Separator } from "@/components/ui/separator";
 
 interface DashboardPanelProps {
-	metric: DailyMetric | null;
-	onOpenChange: (open: boolean) => void;
+	isOpen: boolean;
+	onOpenChange: (isOpen: boolean) => void;
+	data: DailyMetric | null;
+	symbol: string;
 }
 
-// Helper to format large numbers as currency
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-	style: "currency",
-	currency: "USD",
-});
+const MetricRow = ({
+	label,
+	value,
+	valueClass,
+}: {
+	label: string;
+	value: string;
+	valueClass?: string;
+}) => (
+	<div className="flex justify-between items-center py-3">
+		<span className="text-sm text-gray-500">{label}</span>
+		<span className={`text-sm font-semibold text-gray-800 ${valueClass}`}>
+			{value}
+		</span>
+	</div>
+);
 
-export function DashboardPanel({ metric, onOpenChange }: DashboardPanelProps) {
-	const chartData = metric
-		? [
-				{
-					name: "Low",
-					value: metric.low,
-					label: currencyFormatter.format(metric.low),
-				},
-				{
-					name: "Open",
-					value: metric.open,
-					label: currencyFormatter.format(metric.open),
-				},
-				{
-					name: "Close",
-					value: metric.close,
-					label: currencyFormatter.format(metric.close),
-				},
-				{
-					name: "High",
-					value: metric.high,
-					label: currencyFormatter.format(metric.high),
-				},
-		  ]
-		: [];
+const SectionTitle = ({ title }: { title: string }) => (
+	<h4 className="text-md font-semibold text-gray-900 mt-6 mb-2">{title}</h4>
+);
+
+export function DashboardPanel({
+	isOpen,
+	onOpenChange,
+	data,
+	symbol,
+}: DashboardPanelProps) {
+	if (!data) return null;
+
+	const formattedDate = format(new Date(data.date), "MMMM d, yyyy");
+	const isPositive = data.performance >= 0;
+	const priceChange = data.close - data.open;
+	const dailyRange = data.high - data.low;
+	const avgTradeValue = data.liquidity / data.trades;
 
 	return (
-		<Sheet open={!!metric} onOpenChange={onOpenChange}>
-			<SheetContent className="min-w-[400px] sm:min-w-[540px]">
-				{metric && (
-					<>
-						<SheetHeader>
-							<SheetTitle>
-								Daily Breakdown: {metric.date}
-							</SheetTitle>
-							<SheetDescription>
-								Detailed metrics for this trading day.
-							</SheetDescription>
-						</SheetHeader>
-						<div className="mt-6 space-y-4">
-							{/* Price Chart */}
-							<div className="h-64 pr-4">
-								<h3 className="text-lg font-semibold mb-2">
-									Price Range (OHLC)
-								</h3>
-								<ResponsiveContainer width="100%" height="100%">
-									<BarChart
-										data={chartData}
-										layout="vertical">
-										<XAxis
-											type="number"
-											domain={[
-												"dataMin - 100",
-												"dataMax + 100",
-											]}
-											hide
-										/>
-										<YAxis
-											type="category"
-											dataKey="name"
-											width={50}
-										/>
-										<Bar
-											dataKey="value"
-											fill="#8884d8"
-											barSize={30}>
-											<LabelList
-												dataKey="label"
-												position="right"
-												className="fill-foreground text-sm"
-											/>
-										</Bar>
-									</BarChart>
-								</ResponsiveContainer>
-							</div>
-							{/* Key Metrics Grid */}
-							<div className="grid grid-cols-2 gap-4 text-sm">
-								<div className="p-3 bg-muted rounded-lg">
-									<p className="text-muted-foreground">
-										Performance
-									</p>
-									<p
-										className={`font-bold text-lg ${
-											metric.performance >= 0
-												? "text-green-600"
-												: "text-red-600"
-										}`}>
-										{metric.performance.toFixed(2)}%
-									</p>
-								</div>
-								<div className="p-3 bg-muted rounded-lg">
-									<p className="text-muted-foreground">
-										Volatility
-									</p>
-									<p className="font-bold text-lg">
-										{metric.volatility.toFixed(2)}%
-									</p>
-								</div>
-								<div className="p-3 bg-muted rounded-lg col-span-2">
-									<p className="text-muted-foreground">
-										Volume
-									</p>
-									<p className="font-bold text-lg">
-										{currencyFormatter.format(
-											metric.volume * metric.close
-										)}
-									</p>
-								</div>
-							</div>
-						</div>
-					</>
-				)}
+		<Sheet open={isOpen} onOpenChange={onOpenChange}>
+			<SheetContent className="w-[400px] sm:w-[540px] p-6">
+				<SheetHeader>
+					<SheetTitle className="text-2xl">
+						{symbol} - Daily Details
+					</SheetTitle>
+					<SheetDescription>
+						Detailed metrics for {formattedDate}.
+					</SheetDescription>
+				</SheetHeader>
+				<div className="mt-6">
+					<SectionTitle title="Performance" />
+					<Separator />
+					<MetricRow
+						label="Daily Performance"
+						value={`${
+							isPositive ? "+" : ""
+						}${data.performance.toFixed(2)}%`}
+						valueClass={
+							isPositive ? "text-green-600" : "text-red-600"
+						}
+					/>
+					<MetricRow
+						label="Price Change"
+						value={`${isPositive ? "+" : ""}$${priceChange.toFixed(
+							2
+						)}`}
+						valueClass={
+							isPositive ? "text-green-600" : "text-red-600"
+						}
+					/>
+
+					<SectionTitle title="Price Action" />
+					<Separator />
+					<MetricRow
+						label="Open"
+						value={`$${data.open.toFixed(2)}`}
+					/>
+					<MetricRow
+						label="High"
+						value={`$${data.high.toFixed(2)}`}
+					/>
+					<MetricRow label="Low" value={`$${data.low.toFixed(2)}`} />
+					<MetricRow
+						label="Close"
+						value={`$${data.close.toFixed(2)}`}
+					/>
+					<MetricRow
+						label="Daily Range"
+						value={`$${dailyRange.toFixed(2)}`}
+					/>
+
+					<SectionTitle title="Market Insights" />
+					<Separator />
+					<MetricRow
+						label="Volatility"
+						value={`${data.volatility.toFixed(2)}%`}
+					/>
+					<MetricRow
+						label="Volume"
+						value={data.volume.toLocaleString(undefined, {
+							maximumFractionDigits: 0,
+						})}
+					/>
+					<MetricRow
+						label="Liquidity (Turnover)"
+						value={`$${data.liquidity.toLocaleString(undefined, {
+							maximumFractionDigits: 0,
+						})}`}
+					/>
+					<MetricRow
+						label="Number of Trades"
+						value={data.trades.toLocaleString()}
+					/>
+					<MetricRow
+						label="Avg. Trade Value"
+						value={`$${avgTradeValue.toFixed(2)}`}
+					/>
+				</div>
 			</SheetContent>
 		</Sheet>
 	);

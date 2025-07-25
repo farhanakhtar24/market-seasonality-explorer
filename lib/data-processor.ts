@@ -14,10 +14,12 @@ export function transformKlinesToMap(
 		const low = parseFloat(kline[3]);
 		const close = parseFloat(kline[4]);
 		const volume = parseFloat(kline[5]);
+		const trades = kline[8];
 
 		// 1. Enrichment: Calculate metrics
 		const performance = ((close - open) / open) * 100;
 		const volatility = ((high - low) / open) * 100;
+		const liquidity = volume * close;
 
 		// 2. Indexing: Get the key for the map
 		const dateKey = format(new Date(openTime), "yyyy-MM-dd");
@@ -30,8 +32,10 @@ export function transformKlinesToMap(
 			low,
 			close,
 			volume,
+			trades,
 			performance,
 			volatility,
+			liquidity,
 		});
 	}
 

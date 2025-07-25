@@ -29,7 +29,9 @@ export function CalendarCell({
 
 	// Condition 1: Not in the current month (render a blank box)
 	if (!isCurrentMonth) {
-		return <div className="border rounded-md bg-white"></div>;
+		return (
+			<div className="border rounded-md bg-gray-50 aspect-square"></div>
+		);
 	}
 
 	// Condition 2: Is a future date (render a disabled box)
@@ -50,8 +52,7 @@ export function CalendarCell({
 		<div
 			onClick={() => metrics && onDayClick(metrics)}
 			className={cn(
-				// REMOVED h-28. The parent grid now controls the height.
-				"border rounded-md p-2 flex flex-col justify-between",
+				"border rounded-md p-2 flex flex-col justify-between aspect-square",
 				volatilityColor,
 				isToday && "ring-2 ring-blue-500", // Use a ring for 'today' instead of changing BG
 				metrics && "cursor-pointer hover:ring-2 hover:ring-blue-400"
