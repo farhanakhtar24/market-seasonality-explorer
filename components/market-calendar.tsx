@@ -1,7 +1,6 @@
 // src/components/market-calendar.tsx
 "use client";
 
-import { useState } from "react";
 import { addMonths, subMonths, format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button"; // From Shadcn
@@ -16,12 +15,25 @@ import {
 	isToday,
 } from "date-fns";
 import { CalendarCell } from "./calendar-cell"; // Import the cell
+import { DailyMetric } from "@/lib/types";
 
-export function MarketCalendar() {
-	const [currentDate, setCurrentDate] = useState(new Date());
+interface MarketCalendarProps {
+	currentDate: Date;
+	onDateChange: (date: Date) => void;
+	dataMap?: Map<string, DailyMetric>; // It no longer expects maxVolume
+	isNextMonthDisabled: boolean; // Add this line
+}
 
-	const nextMonth = () => setCurrentDate((current) => addMonths(current, 1));
-	const prevMonth = () => setCurrentDate((current) => subMonths(current, 1));
+export function MarketCalendar({
+	currentDate,
+	onDateChange,
+	dataMap,
+	isNextMonthDisabled,
+}: MarketCalendarProps) {
+	// const [currentDate, setCurrentDate] = useState(new Date());
+
+	const nextMonth = () => onDateChange(addMonths(currentDate, 1));
+	const prevMonth = () => onDateChange(subMonths(currentDate, 1));
 
 	const daysInMonth = useMemo(() => {
 		const monthStart = startOfMonth(currentDate);
@@ -45,31 +57,45 @@ export function MarketCalendar() {
 				<h2 className="text-xl font-semibold">
 					{format(currentDate, "MMMM yyyy")}
 				</h2>
-				<Button variant="outline" size="icon" onClick={nextMonth}>
+				<Button
+					variant="outline"
+					size="icon"
+					onClick={nextMonth}
+					disabled={isNextMonthDisabled} // Use the prop here
+				>
 					<ChevronRight className="h-4 w-4" />
 				</Button>
 			</div>
 
 			{/* Calendar Grid */}
-			<div className="grid grid-cols-7 gap-1">
+			<div className="grid grid-cols-7 grid-rows-6 gap-2">
+				{" "}
+				{/* <--- MODIFIED HERE */}
 				{/* Weekday Headers */}
 				{weekdays.map((day) => (
 					<div
 						key={day}
-						className="text-center font-medium text-sm text-muted-foreground">
+						className="text-center font-medium text-sm text-muted-foreground flex items-center justify-center">
 						{day}
 					</div>
 				))}
-
 				{/* Day Cells */}
-				{daysInMonth.map((day) => (
-					<CalendarCell
-						key={day.toString()}
-						day={day}
-						isCurrentMonth={isSameMonth(day, currentDate)}
-						isToday={isToday(day)}
-					/>
-				))}
+				{daysInMonth.map((day) => {
+					// The key for our map
+					const dateKey = format(day, "yyyy-MM-dd");
+					// Perform the lookup
+					const metrics = dataMap?.get(dateKey);
+
+					return (
+						<CalendarCell
+							key={day.toString()}
+							day={day}
+							isCurrentMonth={isSameMonth(day, currentDate)}
+							isToday={isToday(day)}
+							metrics={metrics} // Pass the found metrics down
+						/>
+					);
+				})}
 			</div>
 		</div>
 	);
