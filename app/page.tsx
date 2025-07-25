@@ -25,6 +25,7 @@ import { useMarketData } from "@/hooks/use-market-data";
 import { DashboardView } from "@/components/dashboard-view";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { MarketCalendar } from "@/components/market-calendar";
+import { CalendarLegend } from "@/components/calendar-legend";
 import { DailyMetric } from "@/lib/types";
 
 type ViewMode = "daily" | "weekly" | "monthly" | "yearly";
@@ -69,8 +70,10 @@ export default function HomePage() {
 
 	// --- HANDLERS ---
 	const handleDataPointClick = (data: DailyMetric) => {
-		setSelectedData(data);
-		setIsPanelOpen(true);
+		if (viewMode === "daily") {
+			setSelectedData(data);
+			setIsPanelOpen(true);
+		}
 	};
 
 	// --- NAVIGATION & DISPLAY LOGIC ---
@@ -203,6 +206,7 @@ export default function HomePage() {
 											dataMap={marketDataMap}
 											onDayClick={handleDataPointClick}
 										/>
+										<CalendarLegend />
 									</div>
 								</div>
 							)}

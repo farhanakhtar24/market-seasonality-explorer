@@ -27,6 +27,7 @@ import {
 	BarChart as BarChartIcon,
 	DollarSign,
 } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 interface DashboardViewProps {
 	dataMap: Map<string, DailyMetric>;
@@ -34,12 +35,6 @@ interface DashboardViewProps {
 	periodDisplay: string;
 	onDataPointClick: (data: DailyMetric) => void;
 }
-
-const valueFormatter = (value: number) =>
-	Intl.NumberFormat("en-US", {
-		notation: "compact",
-		maximumFractionDigits: 2,
-	}).format(value);
 
 export function DashboardView({
 	dataMap,
@@ -132,7 +127,7 @@ export function DashboardView({
 				/>
 				<StatCard
 					title="Total Liquidity"
-					value={`$${valueFormatter(summaryStats.totalLiquidity)}`}
+					value={formatCurrency(summaryStats.totalLiquidity)}
 					description="Total value of trades"
 					Icon={DollarSign}
 				/>
@@ -167,18 +162,14 @@ export function DashboardView({
 								<YAxis
 									domain={["dataMin", "dataMax"]}
 									fontSize={12}
-									tickFormatter={valueFormatter}
+									tickFormatter={(value) =>
+										formatCurrency(value)
+									}
 								/>
 								<Tooltip
-									formatter={(
-										value: number,
-										name: string
-									) => {
-										if (name === "Price") {
-											return `$${valueFormatter(value)}`;
-										}
-										return valueFormatter(value);
-									}}
+									formatter={(value: number) =>
+										formatCurrency(value)
+									}
 								/>
 								<Line
 									type="monotone"
@@ -226,7 +217,9 @@ export function DashboardView({
 										dy: 40,
 									}}
 									fontSize={12}
-									tickFormatter={valueFormatter}
+									tickFormatter={(value) =>
+										formatCurrency(value)
+									}
 								/>
 								<YAxis
 									yAxisId="right"
@@ -238,7 +231,9 @@ export function DashboardView({
 										dy: -60,
 									}}
 									fontSize={12}
-									tickFormatter={valueFormatter}
+									tickFormatter={(value) =>
+										formatCurrency(value)
+									}
 								/>
 								<Tooltip
 									formatter={(
@@ -246,9 +241,9 @@ export function DashboardView({
 										name: string
 									) => {
 										if (name === "Liquidity") {
-											return `$${valueFormatter(value)}`;
+											return formatCurrency(value);
 										}
-										return valueFormatter(value);
+										return value.toLocaleString();
 									}}
 								/>
 								<Legend verticalAlign="top" height={36} />

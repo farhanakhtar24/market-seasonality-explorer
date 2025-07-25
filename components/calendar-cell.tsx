@@ -1,6 +1,6 @@
 // src/components/calendar-cell.tsx
 import { format, isAfter } from "date-fns";
-import { cn, getVolatilityColor } from "@/lib/utils";
+import { cn, getVolatilityColor, formatCurrency } from "@/lib/utils";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { DailyMetric } from "@/lib/types";
 import {
@@ -117,11 +117,8 @@ export function CalendarCell({
 							{metrics.volatility.toFixed(2)}%
 						</p>
 						<p>
-							<strong>Volume:</strong> $
-							{Intl.NumberFormat().format(
-								(metrics.volume * metrics.close) / 1_000_000
-							)}
-							M
+							<strong>Liquidity:</strong>{" "}
+							{formatCurrency(metrics.liquidity)}
 						</p>
 					</div>
 				</TooltipContent>
