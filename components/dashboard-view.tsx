@@ -153,7 +153,7 @@ export function DashboardView({
 								margin={{
 									top: 5,
 									right: 20,
-									left: -10,
+									left: 10,
 									bottom: 35,
 								}}
 								onClick={handleChartClick}>
@@ -170,12 +170,15 @@ export function DashboardView({
 									tickFormatter={valueFormatter}
 								/>
 								<Tooltip
-									formatter={(value: number) =>
-										value.toLocaleString("en-US", {
-											style: "currency",
-											currency: "USD",
-										})
-									}
+									formatter={(
+										value: number,
+										name: string
+									) => {
+										if (name === "Price") {
+											return `$${valueFormatter(value)}`;
+										}
+										return valueFormatter(value);
+									}}
 								/>
 								<Line
 									type="monotone"
@@ -203,7 +206,7 @@ export function DashboardView({
 								margin={{
 									top: 5,
 									right: 20,
-									left: 0,
+									left: 10,
 									bottom: 35,
 								}}
 								onClick={handleChartClick}>
@@ -238,14 +241,15 @@ export function DashboardView({
 									tickFormatter={valueFormatter}
 								/>
 								<Tooltip
-									formatter={(value: number, name: string) =>
-										name === "Volume"
-											? value.toLocaleString()
-											: value.toLocaleString("en-US", {
-													style: "currency",
-													currency: "USD",
-											  })
-									}
+									formatter={(
+										value: number,
+										name: string
+									) => {
+										if (name === "Liquidity") {
+											return `$${valueFormatter(value)}`;
+										}
+										return valueFormatter(value);
+									}}
 								/>
 								<Legend verticalAlign="top" height={36} />
 								<Bar
