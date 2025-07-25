@@ -1,9 +1,15 @@
-import React from "react";
+// src/app/page.tsx
+"use client";
 
-type Props = {};
+import { MarketCalendar } from "@/components/market-calendar";
 
-const page = (props: Props) => {
-	return <div>page</div>;
-};
-
-export default page;
+export default function HomePage() {
+	return (
+		<main className="p-4 sm:p-8">
+			<h1 className="text-3xl font-bold mb-6 text-center">
+				Market Seasonality Explorer
+			</h1>
+			<MarketCalendar />
+		</main>
+	);
+}
