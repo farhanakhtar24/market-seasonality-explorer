@@ -22,6 +22,7 @@ interface MarketCalendarProps {
 	onDateChange: (date: Date) => void;
 	dataMap?: Map<string, DailyMetric>; // It no longer expects maxVolume
 	isNextMonthDisabled: boolean; // Add this line
+	onDayClick: (metric: DailyMetric) => void;
 }
 
 export function MarketCalendar({
@@ -29,6 +30,7 @@ export function MarketCalendar({
 	onDateChange,
 	dataMap,
 	isNextMonthDisabled,
+	onDayClick,
 }: MarketCalendarProps) {
 	// const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -93,6 +95,7 @@ export function MarketCalendar({
 							isCurrentMonth={isSameMonth(day, currentDate)}
 							isToday={isToday(day)}
 							metrics={metrics} // Pass the found metrics down
+							onDayClick={onDayClick} // <-- Add this
 						/>
 					);
 				})}

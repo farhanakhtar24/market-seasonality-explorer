@@ -5,8 +5,14 @@ import { useState } from "react";
 import { startOfMonth, endOfMonth, addMonths, isAfter } from "date-fns";
 import { MarketCalendar } from "@/components/market-calendar";
 import { useMarketData } from "@/hooks/use-market-data";
+import { DashboardPanel } from "@/components/dashboard-panel";
+import { DailyMetric } from "@/lib/types";
 
 export default function HomePage() {
+	const [selectedMetric, setSelectedMetric] = useState<DailyMetric | null>(
+		null
+	);
+
 	const [currentDate, setCurrentDate] = useState(new Date());
 
 	// Define the date range for the API call based on the currently viewed month
@@ -26,7 +32,12 @@ export default function HomePage() {
 		startOfMonth(addMonths(currentDate, 1)),
 		today
 	);
-	// ---------------------------------------------
+
+	const handlePanelClose = (open: boolean) => {
+		if (!open) {
+			setSelectedMetric(null);
+		}
+	};
 
 	return (
 		<main className="p-4 sm:p-8">
@@ -38,7 +49,12 @@ export default function HomePage() {
 				currentDate={currentDate}
 				onDateChange={setCurrentDate}
 				dataMap={marketDataMap}
-				isNextMonthDisabled={isNextMonthInFuture} // Pass the boolean as a prop
+				isNextMonthDisabled={isNextMonthInFuture}
+				onDayClick={(metric) => setSelectedMetric(metric)} // Pass the click handler
+			/>
+			<DashboardPanel
+				metric={selectedMetric}
+				onOpenChange={handlePanelClose}
 			/>
 		</main>
 	);

@@ -3,12 +3,19 @@ import { format, isAfter } from "date-fns";
 import { cn, getVolatilityColor } from "@/lib/utils";
 import { ArrowUp, ArrowDown } from "lucide-react";
 import { DailyMetric } from "@/lib/types";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface CalendarCellProps {
 	day: Date;
 	isCurrentMonth: boolean;
 	isToday: boolean;
 	metrics?: DailyMetric; // It only expects the base DailyMetric type
+	onDayClick: (metric: DailyMetric) => void;
 }
 
 export function CalendarCell({
@@ -16,6 +23,7 @@ export function CalendarCell({
 	isCurrentMonth,
 	isToday,
 	metrics,
+	onDayClick,
 }: CalendarCellProps) {
 	const isFutureDate = isAfter(day, new Date());
 
@@ -38,13 +46,15 @@ export function CalendarCell({
 		? getVolatilityColor(metrics.volatility)
 		: "bg-white";
 
-	return (
+	const cellContent = (
 		<div
+			onClick={() => metrics && onDayClick(metrics)}
 			className={cn(
 				// REMOVED h-28. The parent grid now controls the height.
 				"border rounded-md p-2 flex flex-col justify-between",
 				volatilityColor,
-				isToday && "ring-2 ring-blue-500" // Use a ring for 'today' instead of changing BG
+				isToday && "ring-2 ring-blue-500", // Use a ring for 'today' instead of changing BG
+				metrics && "cursor-pointer hover:ring-2 hover:ring-blue-400"
 			)}>
 			{/* Top Section: Day Number and Arrow */}
 			<div className="flex justify-between items-start">
@@ -73,5 +83,48 @@ export function CalendarCell({
 				</div>
 			)}
 		</div>
+	);
+
+	// If there are no metrics, just return the simple cell without a tooltip
+	if (!metrics) {
+		return cellContent;
+	}
+
+	// If there are metrics, wrap the cell content with a tooltip
+	return (
+		<TooltipProvider delayDuration={100}>
+			<Tooltip>
+				<TooltipTrigger asChild>{cellContent}</TooltipTrigger>
+				<TooltipContent>
+					<div className="p-1 text-sm">
+						<p>
+							<strong>Date:</strong> {metrics.date}
+						</p>
+						<p>
+							<strong>Perf:</strong>{" "}
+							<span
+								className={
+									metrics.performance >= 0
+										? "text-green-500"
+										: "text-red-500"
+								}>
+								{metrics.performance.toFixed(2)}%
+							</span>
+						</p>
+						<p>
+							<strong>Vol:</strong>{" "}
+							{metrics.volatility.toFixed(2)}%
+						</p>
+						<p>
+							<strong>Volume:</strong> $
+							{Intl.NumberFormat().format(
+								(metrics.volume * metrics.close) / 1_000_000
+							)}
+							M
+						</p>
+					</div>
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	);
 }
