@@ -46,8 +46,8 @@ export function PriceTrendChart({
 						margin={{
 							top: 5,
 							right: 20,
-							left: 10,
-							bottom: 35,
+							left: 30,
+							bottom: 50,
 						}}
 						onClick={handleChartClick}>
 						<defs>

@@ -45,9 +45,9 @@ export function LiquidityChart({
 						data={chartData}
 						margin={{
 							top: 5,
-							right: 20,
-							left: 10,
-							bottom: 35,
+							right: 30,
+							left: 30,
+							bottom: 50,
 						}}
 						onClick={handleChartClick}>
 						<XAxis
@@ -63,7 +63,7 @@ export function LiquidityChart({
 								value: "Volume",
 								angle: -90,
 								position: "insideLeft",
-								dy: 40,
+								dx: -20,
 							}}
 							fontSize={12}
 							tickFormatter={(value) => formatCurrency(value)}
@@ -75,7 +75,7 @@ export function LiquidityChart({
 								value: "Liquidity (USD)",
 								angle: 90,
 								position: "insideRight",
-								dy: -60,
+								dx: 20,
 							}}
 							fontSize={12}
 							tickFormatter={(value) => formatCurrency(value)}
