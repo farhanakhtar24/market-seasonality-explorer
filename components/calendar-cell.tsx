@@ -30,7 +30,9 @@ export function CalendarCell({
 	// Condition 1: Not in the current month (render a blank box)
 	if (!isCurrentMonth) {
 		return (
-			<div className="border rounded-md bg-gray-50 aspect-square"></div>
+			<div
+				data-testid="blank-cell"
+				className="border rounded-md bg-gray-50 aspect-square"></div>
 		);
 	}
 
