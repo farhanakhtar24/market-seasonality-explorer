@@ -24,40 +24,51 @@ import {
 interface DateRangePickerProps extends React.HTMLAttributes<HTMLDivElement> {
 	date: DateRange | undefined;
 	onDateChange: (date: DateRange | undefined) => void;
+	toDate?: Date;
 }
 
 export function DateRangePicker({
 	className,
 	date,
 	onDateChange,
+	toDate,
 }: DateRangePickerProps) {
 	const handlePresetChange = (value: string) => {
 		const now = new Date();
+		const to = toDate && toDate < now ? toDate : now;
+
 		switch (value) {
 			case "7d":
-				onDateChange({ from: subDays(now, 7), to: now });
+				onDateChange({ from: subDays(to, 7), to });
 				break;
 			case "14d":
-				onDateChange({ from: subDays(now, 14), to: now });
+				onDateChange({ from: subDays(to, 14), to });
 				break;
 			case "1m":
-				onDateChange({ from: subMonths(now, 1), to: now });
+				onDateChange({ from: subMonths(to, 1), to });
 				break;
 			case "3m":
-				onDateChange({ from: subMonths(now, 3), to: now });
+				onDateChange({ from: subMonths(to, 3), to });
 				break;
 			case "6m":
-				onDateChange({ from: subMonths(now, 6), to: now });
+				onDateChange({ from: subMonths(to, 6), to });
 				break;
 			case "1y":
-				onDateChange({ from: subYears(now, 1), to: now });
+				onDateChange({ from: subYears(to, 1), to });
 				break;
 			case "5y":
-				onDateChange({ from: subYears(now, 5), to: now });
+				onDateChange({ from: subYears(to, 5), to });
 				break;
 			default:
 				break;
 		}
+	};
+
+	// Disable future dates
+	const disableFutureDates = (date: Date) => {
+		const today = new Date();
+		today.setHours(23, 59, 59, 999); // End of today
+		return date > today;
 	};
 
 	return (
@@ -116,6 +127,8 @@ export function DateRangePicker({
 						selected={date}
 						onSelect={onDateChange}
 						numberOfMonths={2}
+						disabled={disableFutureDates}
+						toDate={toDate}
 					/>
 				</PopoverContent>
 			</Popover>
