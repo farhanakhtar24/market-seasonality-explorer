@@ -1,7 +1,7 @@
 /// <reference types="@testing-library/jest-dom" />
 import { render, screen } from "@testing-library/react";
 import { CalendarCell } from "./calendar-cell";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 
 // Mock the ArrowUp and ArrowDown components
 jest.mock("lucide-react", () => ({

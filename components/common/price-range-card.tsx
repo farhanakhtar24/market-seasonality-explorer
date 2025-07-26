@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowUpDown } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 
 const PriceRangeCard = ({ data }: { data: DailyMetric }) => {
 	const range = data.high - data.low;

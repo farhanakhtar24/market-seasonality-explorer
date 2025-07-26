@@ -12,7 +12,7 @@ import {
 	format,
 } from "date-fns";
 import { CalendarCell } from "./calendar-cell";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 
 interface MarketCalendarProps {
 	currentDate: Date;

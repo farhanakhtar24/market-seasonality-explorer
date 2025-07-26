@@ -27,7 +27,7 @@ import { DashboardView } from "@/components/dashboard-view";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { MarketCalendar } from "@/components/market-calendar";
 import { CalendarLegend } from "@/components/calendar-legend";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 import { Button } from "@/components/ui/button";
 
 type ViewMode = "daily" | "weekly" | "monthly";

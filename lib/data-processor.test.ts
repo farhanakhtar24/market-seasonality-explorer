@@ -1,5 +1,5 @@
 import { transformKlinesToMap } from "./data-processor";
-import { RawKline } from "@/app/types";
+import { RawKline } from "@/types";
 
 describe("lib/data-processor", () => {
 	describe("transformKlinesToMap", () => {

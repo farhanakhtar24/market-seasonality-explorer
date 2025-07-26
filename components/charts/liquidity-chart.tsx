@@ -18,7 +18,7 @@ import {
 	Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 
 interface LiquidityChartProps {
 	chartData: DailyMetric[];

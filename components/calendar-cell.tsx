@@ -2,7 +2,7 @@
 import { format, isAfter } from "date-fns";
 import { cn, getVolatilityColor, formatCurrency } from "@/lib/utils";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 import {
 	Tooltip,
 	TooltipContent,

@@ -2,7 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMarketData } from "./use-market-data";
 import { getKlines } from "@/services/binance";
-import { RawKline } from "@/app/types";
+import { RawKline } from "@/types";
 import React from "react";
 
 // Mock the getKlines service

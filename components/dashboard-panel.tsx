@@ -1,6 +1,6 @@
 "use client";
 
-import type { DailyMetric } from "@/app/types";
+import type { DailyMetric } from "@/types";
 import {
 	Sheet,
 	SheetContent,

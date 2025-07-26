@@ -8,7 +8,7 @@ import {
 	DollarSign,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 
 interface MainDashboardProps {
 	periodDisplay: string;

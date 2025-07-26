@@ -1,6 +1,6 @@
 // src/lib/data-processor.ts
 import { format } from "date-fns";
-import { DailyMetric, RawKline } from "@/app/types";
+import { DailyMetric, RawKline } from "@/types";
 
 export function transformKlinesToMap(
 	klines: RawKline[]

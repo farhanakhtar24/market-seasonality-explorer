@@ -16,7 +16,7 @@ import {
 	Area,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 
 interface PriceTrendChartProps {
 	chartData: DailyMetric[];

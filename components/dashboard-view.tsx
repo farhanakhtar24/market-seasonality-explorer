@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { DailyMetric } from "@/app/types";
+import { DailyMetric } from "@/types";
 import { PriceTrendChart } from "./charts/price-trend-chart";
 import { LiquidityChart } from "./charts/liquidity-chart";
 import { MainDashboard } from "./views/main-dashboard";
