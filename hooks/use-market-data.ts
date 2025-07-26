@@ -8,8 +8,8 @@ import { transformKlinesToMap } from "@/lib/data-processor";
 export function useMarketData(
 	symbol: string,
 	interval: string,
-	startDate: Date,
-	endDate: Date
+	startDate: Date | undefined,
+	endDate: Date | undefined
 ) {
 	return useQuery({
 		// The queryKey now includes symbol and interval for unique caching
@@ -17,10 +17,13 @@ export function useMarketData(
 			"marketData",
 			symbol,
 			interval,
-			startDate.toISOString(),
-			endDate.toISOString(),
+			startDate?.toISOString(),
+			endDate?.toISOString(),
 		],
 		queryFn: async () => {
+			if (!startDate || !endDate) {
+				return new Map();
+			}
 			const rawData = await getKlines({
 				symbol: symbol,
 				interval: interval, // Pass the dynamic interval
@@ -31,5 +34,6 @@ export function useMarketData(
 		},
 		// It's good practice to keep previous data while new data is loading
 		placeholderData: keepPreviousData,
+		enabled: !!startDate && !!endDate,
 	});
 }

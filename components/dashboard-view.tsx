@@ -86,10 +86,6 @@ export function DashboardView({
 
 	const chartData = summaryStats.sortedData.map((d) => ({
 		...d,
-		displayDate: new Date(d.date).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-		}),
 		Price: d.close,
 		Volume: d.volume,
 		Liquidity: d.liquidity,
@@ -153,7 +149,7 @@ export function DashboardView({
 								}}
 								onClick={handleChartClick}>
 								<XAxis
-									dataKey="displayDate"
+									dataKey="date"
 									fontSize={12}
 									angle={-45}
 									textAnchor="end"
@@ -202,7 +198,7 @@ export function DashboardView({
 								}}
 								onClick={handleChartClick}>
 								<XAxis
-									dataKey="displayDate"
+									dataKey="date"
 									fontSize={12}
 									angle={-45}
 									textAnchor="end"

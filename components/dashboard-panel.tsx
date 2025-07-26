@@ -141,7 +141,9 @@ export function DashboardPanel({
 }: DashboardPanelProps) {
 	if (!data) return null;
 
-	const formattedDate = format(new Date(data.date), "MMMM d, yyyy");
+	const [day, month, year] = data.date.split("/");
+	const date = new Date(`${year}-${month}-${day}`);
+	const formattedDate = format(date, "MMMM d, yyyy");
 	const isPositive = data.performance >= 0;
 	const priceChange = data.close - data.open;
 	const dailyRange = data.high - data.low;

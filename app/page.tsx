@@ -1,16 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import {
-	addMonths,
-	subMonths,
-	addWeeks,
-	subWeeks,
-	addYears,
-	subYears,
-	format,
-	isAfter,
-} from "date-fns";
+import { useState, useMemo, useEffect } from "react";
+import { subMonths, format, subDays } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
 	Select,
@@ -19,8 +12,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { MonthPicker } from "@/components/ui/month-picker";
 import { useMarketData } from "@/hooks/use-market-data";
 import { DashboardView } from "@/components/dashboard-view";
 import { DashboardPanel } from "@/components/dashboard-panel";
@@ -28,13 +21,26 @@ import { MarketCalendar } from "@/components/market-calendar";
 import { CalendarLegend } from "@/components/calendar-legend";
 import { DailyMetric } from "@/lib/types";
 
-type ViewMode = "daily" | "weekly" | "monthly" | "yearly";
+type ViewMode = "daily" | "weekly" | "monthly";
 
 export default function HomePage() {
 	// --- STATE MANAGEMENT ---
-	const [viewMode, setViewMode] = useState<ViewMode>("monthly");
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const [viewMode, setViewMode] = useState<ViewMode>("daily");
 	const [symbol, setSymbol] = useState("BTCUSDT");
-	const [targetDate, setTargetDate] = useState(new Date());
+	const [date, setDate] = useState<DateRange | undefined>(() => {
+		const from = searchParams.get("from");
+		const to = searchParams.get("to");
+		if (from && to) {
+			return { from: new Date(from), to: new Date(to) };
+		}
+		if (viewMode === "monthly") {
+			return { from: subMonths(new Date(), 12), to: new Date() };
+		}
+		return { from: subDays(new Date(), 30), to: new Date() };
+	});
 	const [selectedData, setSelectedData] = useState<DailyMetric | null>(null);
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -43,30 +49,25 @@ export default function HomePage() {
 		daily: "1d",
 		weekly: "1w",
 		monthly: "1M",
-		yearly: "1M",
 	};
-
-	const dataRange = useMemo(() => {
-		const end = targetDate;
-		// For daily view, we fetch data for the entire month to fill the calendar
-		if (viewMode === "daily") return { start: subMonths(end, 1), end };
-		if (viewMode === "weekly") return { start: subMonths(end, 6), end };
-		if (viewMode === "monthly") return { start: subYears(end, 1), end };
-		if (viewMode === "yearly") return { start: subYears(end, 5), end };
-		return { start: end, end };
-	}, [viewMode, targetDate]);
 
 	const {
 		data: marketDataMap,
 		isLoading,
 		isError,
 		error,
-	} = useMarketData(
-		symbol,
-		intervalMap[viewMode],
-		dataRange.start,
-		dataRange.end
-	);
+	} = useMarketData(symbol, intervalMap[viewMode], date?.from, date?.to);
+
+	useEffect(() => {
+		const params = new URLSearchParams(searchParams);
+		if (date?.from) {
+			params.set("from", format(date.from, "yyyy-MM-dd"));
+		}
+		if (date?.to) {
+			params.set("to", format(date.to, "yyyy-MM-dd"));
+		}
+		router.replace(`${pathname}?${params.toString()}`);
+	}, [date, router, pathname, searchParams]);
 
 	// --- HANDLERS ---
 	const handleDataPointClick = (data: DailyMetric) => {
@@ -77,38 +78,14 @@ export default function HomePage() {
 	};
 
 	// --- NAVIGATION & DISPLAY LOGIC ---
-	const handlePrev = () => {
-		if (viewMode === "daily") setTargetDate((d) => subMonths(d, 1));
-		if (viewMode === "weekly") setTargetDate((d) => subWeeks(d, 1));
-		if (viewMode === "monthly") setTargetDate((d) => subMonths(d, 1));
-		if (viewMode === "yearly") setTargetDate((d) => subYears(d, 1));
-	};
-
-	const handleNext = () => {
-		if (viewMode === "daily") setTargetDate((d) => addMonths(d, 1));
-		if (viewMode === "weekly") setTargetDate((d) => addWeeks(d, 1));
-		if (viewMode === "monthly") setTargetDate((d) => addMonths(d, 1));
-		if (viewMode === "yearly") setTargetDate((d) => addYears(d, 1));
-	};
-
-	const isNextDisabled = useMemo(() => {
-		const now = new Date();
-		if (viewMode === "daily") return isAfter(addMonths(targetDate, 1), now);
-		if (viewMode === "weekly") return isAfter(addWeeks(targetDate, 1), now);
-		if (viewMode === "monthly")
-			return isAfter(addMonths(targetDate, 1), now);
-		if (viewMode === "yearly") return isAfter(addYears(targetDate, 1), now);
-		return false;
-	}, [viewMode, targetDate]);
-
 	const periodDisplay = useMemo(() => {
-		if (viewMode === "daily") return format(targetDate, "MMMM yyyy");
-		if (viewMode === "weekly")
-			return `Week of ${format(targetDate, "MMM d, yyyy")}`;
-		if (viewMode === "monthly") return format(targetDate, "MMMM yyyy");
-		if (viewMode === "yearly") return format(targetDate, "yyyy");
-		return "";
-	}, [viewMode, targetDate]);
+		if (!date?.from) return "Select a date range";
+		if (!date.to) return format(date.from, "LLL dd, y");
+		return `${format(date.from, "LLL dd, y")} - ${format(
+			date.to,
+			"LLL dd, y"
+		)}`;
+	}, [date]);
 
 	return (
 		<div className="bg-gray-50 min-h-screen">
@@ -132,25 +109,11 @@ export default function HomePage() {
 						</SelectContent>
 					</Select>
 
-					{/* Time Navigation */}
-					<div className="flex items-center gap-2">
-						<Button
-							variant="outline"
-							size="icon"
-							onClick={handlePrev}>
-							<ChevronLeft className="h-4 w-4" />
-						</Button>
-						<span className="font-semibold text-center w-48">
-							{periodDisplay}
-						</span>
-						<Button
-							variant="outline"
-							size="icon"
-							onClick={handleNext}
-							disabled={isNextDisabled}>
-							<ChevronRight className="h-4 w-4" />
-						</Button>
-					</div>
+					{viewMode === "daily" || viewMode === "weekly" ? (
+						<DateRangePicker date={date} onDateChange={setDate} />
+					) : (
+						<MonthPicker date={date} onDateChange={setDate} />
+					)}
 
 					<ToggleGroup
 						type="single"
@@ -163,7 +126,6 @@ export default function HomePage() {
 						<ToggleGroupItem value="monthly">
 							Monthly
 						</ToggleGroupItem>
-						<ToggleGroupItem value="yearly">Yearly</ToggleGroupItem>
 					</ToggleGroup>
 				</div>
 
@@ -202,7 +164,9 @@ export default function HomePage() {
 											Monthly Heatmap
 										</h2>
 										<MarketCalendar
-											currentDate={targetDate}
+											currentDate={
+												date?.from || new Date()
+											}
 											dataMap={marketDataMap}
 											onDayClick={handleDataPointClick}
 										/>

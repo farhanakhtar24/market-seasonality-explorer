@@ -49,7 +49,7 @@ export function MarketCalendar({
 
 				{/* Day Cells */}
 				{daysInMonth.map((day) => {
-					const dateKey = format(day, "yyyy-MM-dd");
+					const dateKey = format(day, "dd/MM/yyyy");
 					const metrics = dataMap?.get(dateKey);
 
 					return (

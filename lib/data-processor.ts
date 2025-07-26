@@ -22,7 +22,7 @@ export function transformKlinesToMap(
 		const liquidity = volume * close;
 
 		// 2. Indexing: Get the key for the map
-		const dateKey = format(new Date(openTime), "yyyy-MM-dd");
+		const dateKey = format(new Date(openTime), "dd/MM/yyyy");
 
 		// 3. Structure and set in map
 		metricsMap.set(dateKey, {
