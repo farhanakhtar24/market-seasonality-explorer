@@ -51,7 +51,7 @@ export function DashboardPanel({
 
 	return (
 		<Sheet open={isOpen} onOpenChange={onOpenChange}>
-			<SheetContent className="w-full sm:w-[40vw] p-0 overflow-y-auto">
+			<SheetContent className="sm:max-w-xl  p-0 overflow-y-auto">
 				<div className="sticky top-0 bg-white border-b z-10">
 					<SheetHeader className="p-6 pb-4">
 						<div className="flex items-center justify-between">
