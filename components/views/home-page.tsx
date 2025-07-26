@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
 	subMonths,
 	format,
 	subDays,
-	differenceInDays,
 	addMonths,
 	isSameMonth,
 	isFuture,
@@ -23,11 +22,10 @@ import {
 } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { useMarketData } from "@/hooks/use-market-data";
-import { DashboardView } from "@/components/dashboard-view";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { MarketCalendar } from "@/components/market-calendar";
 import { CalendarLegend } from "@/components/calendar-legend";
-import { DailyMetric } from "@/types";
+import { MarketDataPoint } from "@/types";
 import { Button } from "@/components/ui/button";
 
 type ViewMode = "daily" | "weekly" | "monthly";
@@ -47,10 +45,12 @@ export default function HomePage() {
 		if (from && to) {
 			return { from: new Date(from), to: new Date(to) };
 		}
-		return { from: subMonths(defaultTo, 1), to: defaultTo };
+		return { from: subMonths(defaultTo, 3), to: defaultTo };
 	});
-	const [heatmapDate, setHeatmapDate] = useState(date?.to || new Date());
-	const [selectedData, setSelectedData] = useState<DailyMetric | null>(null);
+	const [currentDate, setCurrentDate] = useState(date?.to || new Date());
+	const [selectedData, setSelectedData] = useState<MarketDataPoint | null>(
+		null
+	);
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
 
 	// --- DATA FETCHING LOGIC ---
@@ -67,16 +67,9 @@ export default function HomePage() {
 		error,
 	} = useMarketData(symbol, intervalMap[viewMode], date?.from, date?.to);
 
-	const { data: heatmapDataMap } = useMarketData(
-		symbol,
-		"1d",
-		subMonths(heatmapDate, 1),
-		addMonths(heatmapDate, 1)
-	);
-
 	useEffect(() => {
 		if (date?.to) {
-			setHeatmapDate(date.to);
+			setCurrentDate(date.to);
 		}
 		const params = new URLSearchParams(searchParams);
 		if (date?.from) {
@@ -89,40 +82,46 @@ export default function HomePage() {
 	}, [date, router, pathname, searchParams]);
 
 	// --- HANDLERS ---
-	const handleDataPointClick = (data: DailyMetric) => {
-		if (viewMode === "daily") {
-			setSelectedData(data);
-			setIsPanelOpen(true);
-		}
+	const handleDataPointClick = (data: MarketDataPoint) => {
+		setSelectedData(data);
+		setIsPanelOpen(true);
 	};
 
-	const handleHeatmapPrev = () => {
-		setHeatmapDate((prev) => subMonths(prev, 1));
+	const handlePrev = () => {
+		setCurrentDate((prev) => subMonths(prev, 1));
 	};
 
-	const handleHeatmapNext = () => {
-		setHeatmapDate((prev) => {
+	const handleNext = () => {
+		setCurrentDate((prev) => {
 			const nextMonth = addMonths(prev, 1);
 			return isFuture(nextMonth) ? prev : nextMonth;
 		});
 	};
 
-	// --- NAVIGATION & DISPLAY LOGIC ---
-	const periodDisplay = useMemo(() => {
-		if (!date?.from) return "Select a date range";
-		if (!date.to) return format(date.from, "LLL dd, y");
-		return `${format(date.from, "LLL dd, y")} - ${format(
-			date.to,
-			"LLL dd, y"
-		)}`;
-	}, [date]);
-
-	const daysDifference = useMemo(() => {
-		if (date?.from && date.to) {
-			return differenceInDays(date.to, date.from);
-		}
-		return 30;
-	}, [date]);
+	const CalendarHeader = () => (
+		<div className="flex justify-between items-center mb-4">
+			<h2 className="text-2xl font-semibold">
+				{viewMode.charAt(0).toUpperCase() + viewMode.slice(1)} Calendar
+			</h2>
+			{viewMode === "daily" && (
+				<div className="flex items-center gap-2">
+					<span className="text-sm font-medium">
+						{format(currentDate, "MMMM yyyy")}
+					</span>
+					<Button variant="outline" size="icon" onClick={handlePrev}>
+						<ChevronLeft className="h-4 w-4" />
+					</Button>
+					<Button
+						variant="outline"
+						size="icon"
+						onClick={handleNext}
+						disabled={isSameMonth(currentDate, new Date())}>
+						<ChevronRight className="h-4 w-4" />
+					</Button>
+				</div>
+			)}
+		</div>
+	);
 
 	return (
 		<div className="bg-gray-50 min-h-screen">
@@ -142,7 +141,11 @@ export default function HomePage() {
 						<SelectContent>
 							<SelectItem value="BTCUSDT">BTC/USDT</SelectItem>
 							<SelectItem value="ETHUSDT">ETH/USDT</SelectItem>
+							<SelectItem value="XRPUSDT">XRP/USDT</SelectItem>
+							<SelectItem value="BNBUSDT">BNB/USDT</SelectItem>
 							<SelectItem value="SOLUSDT">SOL/USDT</SelectItem>
+							<SelectItem value="USDCUSDT">USDC/USDT</SelectItem>
+							<SelectItem value="DOGEUSDT">DOGE/USDT</SelectItem>
 						</SelectContent>
 					</Select>
 
@@ -180,73 +183,16 @@ export default function HomePage() {
 					)}
 
 					{marketDataMap && !isLoading && (
-						<>
-							{viewMode === "daily" && (
-								<div className="grid grid-cols-1 gap-8">
-									<div>
-										<h2 className="text-2xl font-semibold mb-4">
-											Last {daysDifference} Days Trend
-										</h2>
-										<DashboardView
-											dataMap={marketDataMap}
-											symbol={symbol}
-											periodDisplay={periodDisplay}
-											onDataPointClick={
-												handleDataPointClick
-											}
-										/>
-									</div>
-									<div>
-										<div className="flex justify-between items-center mb-4">
-											<h2 className="text-2xl font-semibold">
-												Monthly Heatmap
-											</h2>
-											<div className="flex items-center gap-2">
-												<span className="text-sm font-medium">
-													{format(
-														heatmapDate,
-														"MMMM yyyy"
-													)}
-												</span>
-												<Button
-													variant="outline"
-													size="icon"
-													onClick={handleHeatmapPrev}>
-													<ChevronLeft className="h-4 w-4" />
-												</Button>
-												<Button
-													variant="outline"
-													size="icon"
-													onClick={handleHeatmapNext}
-													disabled={isSameMonth(
-														heatmapDate,
-														new Date()
-													)}>
-													<ChevronRight className="h-4 w-4" />
-												</Button>
-											</div>
-										</div>
-										<MarketCalendar
-											currentDate={heatmapDate}
-											dataMap={
-												heatmapDataMap || new Map()
-											}
-											onDayClick={handleDataPointClick}
-										/>
-										<CalendarLegend />
-									</div>
-								</div>
-							)}
-
-							{viewMode !== "daily" && (
-								<DashboardView
-									dataMap={marketDataMap}
-									symbol={symbol}
-									periodDisplay={periodDisplay}
-									onDataPointClick={handleDataPointClick}
-								/>
-							)}
-						</>
+						<div>
+							<CalendarHeader />
+							<MarketCalendar
+								currentDate={currentDate}
+								viewMode={viewMode}
+								dataMap={marketDataMap}
+								onDataPointClick={handleDataPointClick}
+							/>
+							<CalendarLegend />
+						</div>
 					)}
 				</div>
 

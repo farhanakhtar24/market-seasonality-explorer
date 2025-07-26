@@ -4,10 +4,14 @@ This is a [Next.js](https://nextjs.org) project created for the Market Seasonali
 
 ## Features
 
--   **Interactive Calendar**: Daily, weekly, and monthly views with smooth navigation.
--   **Data Visualization Layers**: Volatility heatmaps, liquidity indicators, and performance metrics.
--   **Multi-Timeframe Support**: Detailed daily metrics, weekly summaries, and monthly overviews.
--   **Interactive Dashboard**: A detailed panel appears when a date is selected, showing comprehensive metrics.
+-   **Unified Multi-Timeframe Calendar**: A single, powerful calendar component that displays data in daily, weekly, and monthly views.
+-   **Data Visualization Layers**: Color-coded heatmaps for volatility and clear up/down indicators for performance.
+-   **Keyboard Navigation**: The entire calendar is navigable using arrow keys for quick analysis.
+-   **Enhanced Interactive Dashboard**: A detailed side panel that opens for any selected period (day, week, or month).
+    -   **Daily View**: Shows a detailed breakdown of performance, price action, and market insights.
+    -   **Weekly/Monthly View**: Displays aggregated summary metrics along with daily trend charts for price and liquidity.
+    -   **Technical Indicators**: Includes a 7-day Simple Moving Average (SMA) for daily data.
+    -   **Benchmark Comparison**: Compares daily performance against a mock market benchmark.
 -   **Responsive Design**: The application is designed to work seamlessly across all device sizes.
 
 ## Tech Stack
@@ -48,8 +52,6 @@ Unit tests for critical components and utility functions are included. To run th
 ```bash
 npm test
 ```
-
-_(Note: Test runner configuration is pending)_
 
 ## Deployment
 

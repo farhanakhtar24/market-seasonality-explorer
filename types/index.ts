@@ -1,4 +1,5 @@
-// src/lib/types.ts
+// src/types/index.ts
+
 export type RawKline = [
 	number, // Open time
 	string, // Open
@@ -15,7 +16,8 @@ export type RawKline = [
 ];
 
 export interface DailyMetric {
-	date: string; // "yyyy-MM-dd"
+	type: "daily";
+	date: string; // "dd/MM/yyyy"
 	open: number;
 	high: number;
 	low: number;
@@ -25,4 +27,43 @@ export interface DailyMetric {
 	performance: number; // Daily % change
 	volatility: number; // Daily range %
 	liquidity: number; // Turnover
+	sma7?: number; // 7-day simple moving average
 }
+
+export interface WeeklyMetric {
+	type: "weekly";
+	date: string; // "yyyy-ww" e.g. "2023-42"
+	startDate: Date;
+	endDate: Date;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+	volume: number;
+	trades: number;
+	performance: number;
+	volatility: number;
+	liquidity: number;
+	// Optional: could include an array of daily metrics
+	days: DailyMetric[];
+}
+
+export interface MonthlyMetric {
+	type: "monthly";
+	date: string; // "yyyy-MM" e.g. "2023-10"
+	startDate: Date;
+	endDate: Date;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+	volume: number;
+	trades: number;
+	performance: number;
+	volatility: number;
+	liquidity: number;
+	// Optional: could include an array of daily metrics
+	days: DailyMetric[];
+}
+
+export type MarketDataPoint = DailyMetric | WeeklyMetric | MonthlyMetric;

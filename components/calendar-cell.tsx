@@ -2,7 +2,7 @@
 import { format, isAfter } from "date-fns";
 import { cn, getVolatilityColor, formatCurrency } from "@/lib/utils";
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { DailyMetric } from "@/types";
+import { DailyMetric, MarketDataPoint } from "@/types";
 import {
 	Tooltip,
 	TooltipContent,
@@ -14,8 +14,9 @@ interface CalendarCellProps {
 	day: Date;
 	isCurrentMonth: boolean;
 	isToday: boolean;
-	metrics?: DailyMetric; // It only expects the base DailyMetric type
-	onDayClick: (metric: DailyMetric) => void;
+	metrics?: DailyMetric;
+	onDayClick: (metric: MarketDataPoint) => void;
+	isFocused?: boolean;
 }
 
 export function CalendarCell({
@@ -24,6 +25,7 @@ export function CalendarCell({
 	isToday,
 	metrics,
 	onDayClick,
+	isFocused,
 }: CalendarCellProps) {
 	const isFutureDate = isAfter(day, new Date());
 
@@ -56,7 +58,8 @@ export function CalendarCell({
 			className={cn(
 				"border rounded-md p-2 flex flex-col justify-between aspect-square",
 				volatilityColor,
-				isToday && "ring-2 ring-blue-500", // Use a ring for 'today' instead of changing BG
+				isToday && "ring-2 ring-blue-500",
+				isFocused && "ring-2 ring-green-500", // Focus ring
 				metrics && "cursor-pointer hover:ring-2 hover:ring-blue-400"
 			)}>
 			{/* Top Section: Day Number and Arrow */}

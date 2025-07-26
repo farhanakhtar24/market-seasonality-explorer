@@ -3,7 +3,7 @@
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { getKlines } from "@/services/binance";
-import { transformKlinesToMap } from "@/lib/data-processor";
+import { processKlines } from "@/lib/data-processor";
 
 export function useMarketData(
 	symbol: string,
@@ -30,7 +30,7 @@ export function useMarketData(
 				startTime: startDate.getTime(),
 				endTime: endDate.getTime(),
 			});
-			return transformKlinesToMap(rawData);
+			return processKlines(rawData, interval);
 		},
 		// It's good practice to keep previous data while new data is loading
 		placeholderData: keepPreviousData,

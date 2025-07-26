@@ -18,9 +18,6 @@ jest.mock("next/navigation", () => ({
 }));
 
 // Mock child components to isolate the page component
-jest.mock("@/components/dashboard-view", () => ({
-	DashboardView: () => <div data-testid="dashboard-view"></div>,
-}));
 jest.mock("@/components/market-calendar", () => ({
 	MarketCalendar: () => <div data-testid="market-calendar"></div>,
 }));
@@ -48,7 +45,7 @@ describe("app/page.tsx", () => {
 		expect(screen.getByText(/Loading.../i)).toBeInTheDocument();
 	});
 
-	it("should render the dashboard and calendar when data is available", () => {
+	it("should render the calendar when data is available", () => {
 		mockedUseMarketData.mockReturnValue({
 			isLoading: false,
 			isError: false,
@@ -57,7 +54,6 @@ describe("app/page.tsx", () => {
 
 		render(<HomePage />);
 
-		expect(screen.getByTestId("dashboard-view")).toBeInTheDocument();
 		expect(screen.getByTestId("market-calendar")).toBeInTheDocument();
 	});
 
@@ -75,7 +71,8 @@ describe("app/page.tsx", () => {
 	});
 
 	// This test is more complex and simulates user interaction
-	it("should change view mode when a toggle button is clicked", async () => {
+	it("should re-fetch data with the correct interval when view mode changes", async () => {
+		// Initial render with daily data
 		mockedUseMarketData.mockReturnValue({
 			isLoading: false,
 			isError: false,
@@ -84,12 +81,23 @@ describe("app/page.tsx", () => {
 
 		render(<HomePage />);
 
+		// The hook is called with '1d' on initial render
+		expect(mockedUseMarketData).toHaveBeenCalledWith(
+			expect.any(String),
+			"1d",
+			expect.any(Date),
+			expect.any(Date)
+		);
+
 		const weeklyButton = screen.getByRole("radio", { name: /Weekly/i });
 		await userEvent.click(weeklyButton);
 
-		// The component re-renders, but we can't directly test the state `viewMode`.
-		// However, we can check for its side effects. In this case, the MarketCalendar
-		// should disappear because it only renders in 'daily' view.
-		expect(screen.queryByTestId("market-calendar")).not.toBeInTheDocument();
+		// After clicking 'Weekly', the hook should be called again with '1w'
+		expect(mockedUseMarketData).toHaveBeenCalledWith(
+			expect.any(String),
+			"1w",
+			expect.any(Date),
+			expect.any(Date)
+		);
 	});
 });

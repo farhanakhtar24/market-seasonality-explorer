@@ -17,7 +17,8 @@ describe("components/calendar-cell", () => {
 	yesterday.setDate(today.getDate() - 1);
 
 	const mockMetrics: DailyMetric = {
-		date: "2025-07-25",
+		type: "daily",
+		date: "25/07/2025",
 		open: 100,
 		high: 110,
 		low: 90,
@@ -36,6 +37,7 @@ describe("components/calendar-cell", () => {
 				isCurrentMonth={false}
 				isToday={false}
 				onDayClick={mockOnDayClick}
+				isFocused={false}
 			/>
 		);
 		// The blank div has no text, so we check for its presence by its test id
@@ -53,6 +55,7 @@ describe("components/calendar-cell", () => {
 				isCurrentMonth={true}
 				isToday={false}
 				onDayClick={mockOnDayClick}
+				isFocused={false}
 			/>
 		);
 		expect(
@@ -72,6 +75,7 @@ describe("components/calendar-cell", () => {
 				isToday={false}
 				metrics={mockMetrics}
 				onDayClick={mockOnDayClick}
+				isFocused={false}
 			/>
 		);
 		// Check for day number
@@ -94,6 +98,7 @@ describe("components/calendar-cell", () => {
 				isToday={true}
 				metrics={mockMetrics}
 				onDayClick={mockOnDayClick}
+				isFocused={false}
 			/>
 		);
 		const cell = screen.getByText(today.getDate().toString()).parentElement
@@ -110,8 +115,25 @@ describe("components/calendar-cell", () => {
 				isToday={false}
 				metrics={negativeMetrics}
 				onDayClick={mockOnDayClick}
+				isFocused={false}
 			/>
 		);
 		expect(screen.getByText("ArrowDown")).toBeInTheDocument();
+	});
+
+	it("should apply a focus ring when isFocused is true", () => {
+		render(
+			<CalendarCell
+				day={yesterday}
+				isCurrentMonth={true}
+				isToday={false}
+				metrics={mockMetrics}
+				onDayClick={mockOnDayClick}
+				isFocused={true}
+			/>
+		);
+		const cell = screen.getByText(yesterday.getDate().toString())
+			.parentElement?.parentElement;
+		expect(cell).toHaveClass("ring-2 ring-green-500");
 	});
 });
