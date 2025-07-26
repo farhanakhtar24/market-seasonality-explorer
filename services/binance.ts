@@ -1,5 +1,5 @@
 // src/services/binance.ts
-import { RawKline } from "@/lib/types";
+import { RawKline } from "@/app/types";
 
 export async function getKlines({
 	symbol,

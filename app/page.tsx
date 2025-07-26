@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { subMonths, format, subDays } from "date-fns";
+import { subMonths, format, subDays, differenceInDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -13,13 +13,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
-import { MonthPicker } from "@/components/ui/month-picker";
 import { useMarketData } from "@/hooks/use-market-data";
 import { DashboardView } from "@/components/dashboard-view";
 import { DashboardPanel } from "@/components/dashboard-panel";
 import { MarketCalendar } from "@/components/market-calendar";
 import { CalendarLegend } from "@/components/calendar-legend";
-import { DailyMetric } from "@/lib/types";
+import { DailyMetric } from "@/app/types";
 
 type ViewMode = "daily" | "weekly" | "monthly";
 
@@ -87,6 +86,13 @@ export default function HomePage() {
 		)}`;
 	}, [date]);
 
+	const daysDifference = useMemo(() => {
+		if (date?.from && date.to) {
+			return differenceInDays(date.to, date.from);
+		}
+		return 30;
+	}, [date]);
+
 	return (
 		<div className="bg-gray-50 min-h-screen">
 			<main className="container mx-auto p-4 sm:p-8">
@@ -109,11 +115,7 @@ export default function HomePage() {
 						</SelectContent>
 					</Select>
 
-					{viewMode === "daily" || viewMode === "weekly" ? (
-						<DateRangePicker date={date} onDateChange={setDate} />
-					) : (
-						<MonthPicker date={date} onDateChange={setDate} />
-					)}
+					<DateRangePicker date={date} onDateChange={setDate} />
 
 					<ToggleGroup
 						type="single"
@@ -148,12 +150,12 @@ export default function HomePage() {
 								<div className="grid grid-cols-1 gap-8">
 									<div>
 										<h2 className="text-2xl font-semibold mb-4">
-											Last 30 Days Trend
+											Last {daysDifference} Days Trend
 										</h2>
 										<DashboardView
 											dataMap={marketDataMap}
 											symbol={symbol}
-											periodDisplay="Last 30 Days"
+											periodDisplay={periodDisplay}
 											onDataPointClick={
 												handleDataPointClick
 											}

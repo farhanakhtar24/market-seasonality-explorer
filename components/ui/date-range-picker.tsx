@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
+import { format, subDays, subMonths, subYears } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
@@ -13,6 +13,13 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 interface DateRangePickerProps extends React.HTMLAttributes<HTMLDivElement> {
 	date: DateRange | undefined;
@@ -24,6 +31,35 @@ export function DateRangePicker({
 	date,
 	onDateChange,
 }: DateRangePickerProps) {
+	const handlePresetChange = (value: string) => {
+		const now = new Date();
+		switch (value) {
+			case "7d":
+				onDateChange({ from: subDays(now, 7), to: now });
+				break;
+			case "14d":
+				onDateChange({ from: subDays(now, 14), to: now });
+				break;
+			case "1m":
+				onDateChange({ from: subMonths(now, 1), to: now });
+				break;
+			case "3m":
+				onDateChange({ from: subMonths(now, 3), to: now });
+				break;
+			case "6m":
+				onDateChange({ from: subMonths(now, 6), to: now });
+				break;
+			case "1y":
+				onDateChange({ from: subYears(now, 1), to: now });
+				break;
+			case "5y":
+				onDateChange({ from: subYears(now, 5), to: now });
+				break;
+			default:
+				break;
+		}
+	};
+
 	return (
 		<div className={cn("grid gap-2", className)}>
 			<Popover>
@@ -51,6 +87,28 @@ export function DateRangePicker({
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent className="w-auto p-0" align="start">
+					<div className="flex items-center justify-between p-2">
+						<Select onValueChange={handlePresetChange}>
+							<SelectTrigger className="w-[180px]">
+								<SelectValue placeholder="Select Preset" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="7d">Last 7 days</SelectItem>
+								<SelectItem value="14d">
+									Last 14 days
+								</SelectItem>
+								<SelectItem value="1m">Last month</SelectItem>
+								<SelectItem value="3m">
+									Last 3 months
+								</SelectItem>
+								<SelectItem value="6m">
+									Last 6 months
+								</SelectItem>
+								<SelectItem value="1y">Last year</SelectItem>
+								<SelectItem value="5y">Last 5 years</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
 					<Calendar
 						initialFocus
 						mode="range"

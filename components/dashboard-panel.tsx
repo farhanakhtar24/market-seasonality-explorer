@@ -1,6 +1,6 @@
 "use client";
 
-import type { DailyMetric } from "@/lib/types";
+import type { DailyMetric } from "@/app/types";
 import {
 	Sheet,
 	SheetContent,
@@ -8,7 +8,6 @@ import {
 	SheetTitle,
 	SheetDescription,
 } from "@/components/ui/sheet";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
@@ -20,12 +19,12 @@ import {
 	Activity,
 	Volume2,
 	Target,
-	ArrowUpDown,
 	Calendar,
 	Percent,
-	type LucideIcon,
 } from "lucide-react";
 import { formatCurrency, formatVolume } from "@/lib/utils";
+import MetricCard from "@/components/common/metric-card";
+import PriceRangeCard from "@/components/common/price-range-card";
 
 interface DashboardPanelProps {
 	isOpen: boolean;
@@ -33,105 +32,6 @@ interface DashboardPanelProps {
 	data: DailyMetric | null;
 	symbol: string;
 }
-
-const MetricCard = ({
-	icon: Icon,
-	label,
-	value,
-	valueClass,
-	subtitle,
-	trend,
-}: {
-	icon: LucideIcon;
-	label: string;
-	value: string;
-	valueClass?: string;
-	subtitle?: string;
-	trend?: "up" | "down" | "neutral";
-}) => (
-	<Card className="hover:shadow-md transition-shadow duration-200">
-		<CardContent className="p-4">
-			<div className="flex items-start justify-between">
-				<div className="flex items-center space-x-3">
-					<div
-						className={`p-2 rounded-lg ${
-							trend === "up"
-								? "bg-green-100 text-green-600"
-								: trend === "down"
-								? "bg-red-100 text-red-600"
-								: "bg-blue-100 text-blue-600"
-						}`}>
-						<Icon className="h-4 w-4" />
-					</div>
-					<div>
-						<p className="text-sm font-medium text-gray-600">
-							{label}
-						</p>
-						{subtitle && (
-							<p className="text-xs text-gray-400">{subtitle}</p>
-						)}
-					</div>
-				</div>
-				<div className="text-right flex-shrink-0">
-					<p
-						className={`text-lg font-bold ${
-							valueClass || "text-gray-900"
-						}`}>
-						{value}
-					</p>
-				</div>
-			</div>
-		</CardContent>
-	</Card>
-);
-
-const PriceRangeCard = ({ data }: { data: DailyMetric }) => {
-	const range = data.high - data.low;
-	const currentPosition =
-		range > 0 ? ((data.close - data.low) / range) * 100 : 50;
-
-	return (
-		<Card className="hover:shadow-md transition-shadow duration-200">
-			<CardHeader className="pb-3">
-				<CardTitle className="text-sm font-medium flex items-center gap-2">
-					<ArrowUpDown className="h-4 w-4 text-blue-600" />
-					Price Range
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="pt-0">
-				<div className="space-y-3">
-					<div className="flex justify-between text-sm">
-						<span className="text-gray-600">
-							Low: {formatCurrency(data.low)}
-						</span>
-						<span className="text-gray-600">
-							High: {formatCurrency(data.high)}
-						</span>
-					</div>
-					<div className="relative">
-						<div className="w-full bg-gray-200 rounded-full h-2">
-							<div
-								className="bg-gradient-to-r from-red-400 to-green-400 h-2 rounded-full"
-								style={{ width: "100%" }}
-							/>
-							<div
-								className="absolute top-0 w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-md transform -translate-y-0.5"
-								style={{
-									left: `calc(${currentPosition}% - 6px)`,
-								}}
-							/>
-						</div>
-					</div>
-					<div className="text-center">
-						<span className="text-sm font-semibold text-blue-600">
-							Current: {formatCurrency(data.close)}
-						</span>
-					</div>
-				</div>
-			</CardContent>
-		</Card>
-	);
-};
 
 export function DashboardPanel({
 	isOpen,
