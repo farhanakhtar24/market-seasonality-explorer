@@ -1,4 +1,3 @@
-// src/services/binance.ts
 import { RawKline } from "@/types";
 
 export async function getKlines({

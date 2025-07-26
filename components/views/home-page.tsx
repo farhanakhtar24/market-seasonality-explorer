@@ -31,7 +31,6 @@ import { Button } from "@/components/ui/button";
 type ViewMode = "daily" | "weekly" | "monthly";
 
 export default function HomePage() {
-	// --- STATE MANAGEMENT ---
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -53,7 +52,6 @@ export default function HomePage() {
 	);
 	const [isPanelOpen, setIsPanelOpen] = useState(false);
 
-	// --- DATA FETCHING LOGIC ---
 	const intervalMap: { [key in ViewMode]: string } = {
 		daily: "1d",
 		weekly: "1w",
@@ -81,7 +79,6 @@ export default function HomePage() {
 		router.replace(`${pathname}?${params.toString()}`);
 	}, [date, router, pathname, searchParams]);
 
-	// --- HANDLERS ---
 	const handleDataPointClick = (data: MarketDataPoint) => {
 		setSelectedData(data);
 		setIsPanelOpen(true);
@@ -132,7 +129,6 @@ export default function HomePage() {
 					</h1>
 				</div>
 
-				{/* --- UI CONTROLS --- */}
 				<div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
 					<Select value={symbol} onValueChange={setSymbol}>
 						<SelectTrigger className="w-full sm:w-[180px]">
@@ -169,7 +165,6 @@ export default function HomePage() {
 					</ToggleGroup>
 				</div>
 
-				{/* --- DYNAMIC CONTENT AREA --- */}
 				<div className="min-h-[500px]">
 					{isLoading && (
 						<p className="text-center text-lg text-muted-foreground pt-16">

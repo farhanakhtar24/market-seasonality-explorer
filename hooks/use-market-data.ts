@@ -1,4 +1,3 @@
-// src/hooks/use-market-data.ts
 "use client";
 
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
@@ -12,7 +11,6 @@ export function useMarketData(
 	endDate: Date | undefined
 ) {
 	return useQuery({
-		// The queryKey now includes symbol and interval for unique caching
 		queryKey: [
 			"marketData",
 			symbol,
@@ -26,13 +24,12 @@ export function useMarketData(
 			}
 			const rawData = await getKlines({
 				symbol: symbol,
-				interval: interval, // Pass the dynamic interval
+				interval: interval,
 				startTime: startDate.getTime(),
 				endTime: endDate.getTime(),
 			});
 			return processKlines(rawData, interval);
 		},
-		// It's good practice to keep previous data while new data is loading
 		placeholderData: keepPreviousData,
 		enabled: !!startDate && !!endDate,
 	});

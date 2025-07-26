@@ -1,4 +1,3 @@
-// src/components/stat-card.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
 import { DateRangePicker } from "./ui/date-range-picker";

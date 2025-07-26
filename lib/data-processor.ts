@@ -14,7 +14,6 @@ import {
 	MonthlyMetric,
 } from "@/types";
 
-// This function now handles different intervals and returns a map with the appropriate data type.
 export function processKlines(
 	klines: RawKline[],
 	interval: string
@@ -55,7 +54,7 @@ export function processKlines(
 					performance,
 					volatility,
 					liquidity,
-					days: [], // This could be populated if we also fetch daily data
+					days: [],
 				} as WeeklyMetric;
 				break;
 			}
@@ -79,7 +78,6 @@ export function processKlines(
 				} as MonthlyMetric;
 				break;
 			}
-			// Daily is the default
 			default: {
 				key = format(openTime, "dd/MM/yyyy");
 				dataPoint = {
@@ -101,12 +99,10 @@ export function processKlines(
 		metricsMap.set(key, dataPoint);
 	}
 
-	// Post-process to calculate SMA for daily data
 	if (interval === "1d") {
 		const dailyMetrics = Array.from(metricsMap.values()).filter(
 			(m): m is DailyMetric => m.type === "daily"
 		);
-		// Sort by date to ensure correct order for SMA calculation
 		dailyMetrics.sort(
 			(a, b) =>
 				new Date(a.date.split("/").reverse().join("-")).getTime() -
@@ -119,7 +115,6 @@ export function processKlines(
 				.reduce((acc, curr) => acc + curr.close, 0);
 			const sma = sum / 7;
 			const currentMetric = dailyMetrics[i];
-			// Update the metric in the original map
 			const metricInMap = metricsMap.get(
 				currentMetric.date
 			) as DailyMetric;

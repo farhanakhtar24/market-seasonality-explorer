@@ -1,4 +1,3 @@
-// components/monthly-cell.tsx
 "use client";
 
 import { format } from "date-fns";
@@ -36,7 +35,6 @@ export function MonthlyCell({
 				"cursor-pointer hover:ring-2 hover:ring-blue-400",
 				isFocused && "ring-2 ring-green-500"
 			)}>
-			{/* Top Section: Month Label and Arrow */}
 			<div className="flex justify-between items-start">
 				<span className="font-bold text-gray-800">{monthLabel}</span>
 				{metrics.performance >= 0 ? (
@@ -46,10 +44,8 @@ export function MonthlyCell({
 				)}
 			</div>
 
-			{/* Middle Section: Year */}
 			<div className="text-sm text-gray-500">{yearLabel}</div>
 
-			{/* Bottom Section: Metrics */}
 			<div className="text-left mt-2">
 				<p className="font-bold text-xl text-gray-900">
 					{metrics.performance.toFixed(2)}%

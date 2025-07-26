@@ -1,4 +1,3 @@
-// src/components/calendar-cell.tsx
 import { format, isAfter } from "date-fns";
 import { cn, getVolatilityColor, formatCurrency } from "@/lib/utils";
 import { ArrowUp, ArrowDown } from "lucide-react";
@@ -29,7 +28,6 @@ export function CalendarCell({
 }: CalendarCellProps) {
 	const isFutureDate = isAfter(day, new Date());
 
-	// Condition 1: Not in the current month (render a blank box)
 	if (!isCurrentMonth) {
 		return (
 			<div
@@ -38,7 +36,6 @@ export function CalendarCell({
 		);
 	}
 
-	// Condition 2: Is a future date (render a disabled box)
 	if (isFutureDate) {
 		return (
 			<div className="border rounded-md p-2 bg-gray-50 text-muted-foreground pointer-events-none">
@@ -47,7 +44,6 @@ export function CalendarCell({
 		);
 	}
 
-	// Condition 3: Is a past or present date (render the full data cell)
 	const volatilityColor = metrics
 		? getVolatilityColor(metrics.volatility)
 		: "bg-white";
@@ -59,10 +55,9 @@ export function CalendarCell({
 				"border rounded-md p-2 flex flex-col justify-between aspect-square",
 				volatilityColor,
 				isToday && "ring-2 ring-blue-500",
-				isFocused && "ring-2 ring-green-500", // Focus ring
+				isFocused && "ring-2 ring-green-500",
 				metrics && "cursor-pointer hover:ring-2 hover:ring-blue-400"
 			)}>
-			{/* Top Section: Day Number and Arrow */}
 			<div className="flex justify-between items-start">
 				<span className="text-sm font-medium text-gray-800">
 					{format(day, "d")}
@@ -75,11 +70,8 @@ export function CalendarCell({
 					))}
 			</div>
 
-			{/* Bottom Section: Metrics */}
 			{metrics && (
 				<div className="text-left">
-					{" "}
-					{/* <-- text-left to match the image */}
 					<p className="font-bold text-gray-900">
 						{metrics.performance.toFixed(2)}%
 					</p>
@@ -91,12 +83,10 @@ export function CalendarCell({
 		</div>
 	);
 
-	// If there are no metrics, just return the simple cell without a tooltip
 	if (!metrics) {
 		return cellContent;
 	}
 
-	// If there are metrics, wrap the cell content with a tooltip
 	return (
 		<TooltipProvider delayDuration={100}>
 			<Tooltip>

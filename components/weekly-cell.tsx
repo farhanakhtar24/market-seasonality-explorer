@@ -1,4 +1,3 @@
-// components/weekly-cell.tsx
 "use client";
 
 import { format } from "date-fns";
@@ -39,7 +38,6 @@ export function WeeklyCell({
 				"cursor-pointer hover:ring-2 hover:ring-blue-400",
 				isFocused && "ring-2 ring-green-500"
 			)}>
-			{/* Top Section: Week Label and Arrow */}
 			<div className="flex justify-between items-start">
 				<span className="font-bold text-gray-800">{weekLabel}</span>
 				{metrics.performance >= 0 ? (
@@ -49,10 +47,8 @@ export function WeeklyCell({
 				)}
 			</div>
 
-			{/* Middle Section: Date Range */}
 			<div className="text-xs text-gray-500">{dateRangeLabel}</div>
 
-			{/* Bottom Section: Metrics */}
 			<div className="text-left mt-2">
 				<p className="font-bold text-lg text-gray-900">
 					{metrics.performance.toFixed(2)}%

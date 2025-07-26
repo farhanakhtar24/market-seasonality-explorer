@@ -42,7 +42,6 @@ interface DashboardPanelProps {
 	symbol: string;
 }
 
-// --- Sub-component for Aggregated View (Weekly/Monthly) ---
 function AggregatedViewPanel({
 	data,
 	symbol,
@@ -68,7 +67,6 @@ function AggregatedViewPanel({
 
 	return (
 		<div className="space-y-6">
-			{/* Summary Cards */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 				<MetricCard
 					icon={data.performance >= 0 ? TrendingUp : TrendingDown}
@@ -101,7 +99,6 @@ function AggregatedViewPanel({
 
 			<Separator />
 
-			{/* Charts */}
 			<div>
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<LineChart className="h-5 w-5 text-blue-600" />
@@ -129,7 +126,6 @@ function AggregatedViewPanel({
 	);
 }
 
-// --- Sub-component for Daily View ---
 function DailyViewPanel({ data }: { data: DailyMetric }) {
 	const isPositive = data.performance >= 0;
 	const priceChange = data.close - data.open;
@@ -140,7 +136,6 @@ function DailyViewPanel({ data }: { data: DailyMetric }) {
 
 	return (
 		<div className="space-y-6">
-			{/* Performance Overview */}
 			<div>
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<Activity className="h-5 w-5 text-blue-600" />
@@ -192,7 +187,6 @@ function DailyViewPanel({ data }: { data: DailyMetric }) {
 
 			<Separator />
 
-			{/* Price Action */}
 			<div>
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<Target className="h-5 w-5 text-blue-600" />
@@ -219,7 +213,6 @@ function DailyViewPanel({ data }: { data: DailyMetric }) {
 
 			<Separator />
 
-			{/* Market Insights */}
 			<div>
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<BarChart3 className="h-5 w-5 text-blue-600" />
@@ -259,7 +252,6 @@ function DailyViewPanel({ data }: { data: DailyMetric }) {
 
 			<Separator />
 
-			{/* Technical Indicators */}
 			<div>
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<BarChart3 className="h-5 w-5 text-blue-600" />
@@ -280,7 +272,6 @@ function DailyViewPanel({ data }: { data: DailyMetric }) {
 	);
 }
 
-// --- Main Panel Component ---
 export function DashboardPanel({
 	isOpen,
 	onOpenChange,

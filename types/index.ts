@@ -1,38 +1,36 @@
-// src/types/index.ts
-
 export type RawKline = [
-	number, // Open time
-	string, // Open
-	string, // High
-	string, // Low
-	string, // Close
-	string, // Volume
-	number, // Close time
-	string, // Quote asset volume
-	number, // Number of trades
-	string, // Taker buy base asset volume
-	string, // Taker buy quote asset volume
-	string // Ignore
+	number,
+	string,
+	string,
+	string,
+	string,
+	string,
+	number,
+	string,
+	number,
+	string,
+	string,
+	string
 ];
 
 export interface DailyMetric {
 	type: "daily";
-	date: string; // "dd/MM/yyyy"
+	date: string;
 	open: number;
 	high: number;
 	low: number;
 	close: number;
 	volume: number;
 	trades: number;
-	performance: number; // Daily % change
-	volatility: number; // Daily range %
-	liquidity: number; // Turnover
-	sma7?: number; // 7-day simple moving average
+	performance: number;
+	volatility: number;
+	liquidity: number;
+	sma7?: number;
 }
 
 export interface WeeklyMetric {
 	type: "weekly";
-	date: string; // "yyyy-ww" e.g. "2023-42"
+	date: string;
 	startDate: Date;
 	endDate: Date;
 	open: number;
@@ -44,13 +42,12 @@ export interface WeeklyMetric {
 	performance: number;
 	volatility: number;
 	liquidity: number;
-	// Optional: could include an array of daily metrics
 	days: DailyMetric[];
 }
 
 export interface MonthlyMetric {
 	type: "monthly";
-	date: string; // "yyyy-MM" e.g. "2023-10"
+	date: string;
 	startDate: Date;
 	endDate: Date;
 	open: number;
@@ -62,7 +59,6 @@ export interface MonthlyMetric {
 	performance: number;
 	volatility: number;
 	liquidity: number;
-	// Optional: could include an array of daily metrics
 	days: DailyMetric[];
 }
 
