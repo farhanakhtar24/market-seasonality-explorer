@@ -100,15 +100,19 @@ export function MarketCalendar({
 	}, [currentDate, viewMode]);
 
 	const renderDailyView = () => {
-		const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+		const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+		const longWeekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 		return (
 			<>
 				<div className="grid grid-cols-7 gap-1">
-					{weekdays.map((day) => (
+					{weekdays.map((day, i) => (
 						<div
 							key={day}
 							className="text-center font-medium text-sm text-muted-foreground pb-2">
-							{day}
+							<span className="sm:hidden">{day}</span>
+							<span className="hidden sm:inline">
+								{longWeekdays[i]}
+							</span>
 						</div>
 					))}
 				</div>

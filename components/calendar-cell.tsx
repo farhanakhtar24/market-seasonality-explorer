@@ -52,14 +52,14 @@ export function CalendarCell({
 		<div
 			onClick={() => metrics && onDayClick(metrics)}
 			className={cn(
-				"border rounded-md p-2 flex flex-col justify-between aspect-square",
+				"border rounded-md p-1 sm:p-2 flex flex-col justify-between aspect-square",
 				volatilityColor,
 				isToday && "ring-2 ring-blue-500",
 				isFocused && "ring-2 ring-green-500",
 				metrics && "cursor-pointer hover:ring-2 hover:ring-blue-400"
 			)}>
 			<div className="flex justify-between items-start">
-				<span className="text-sm font-medium text-gray-800">
+				<span className="text-[10px] sm:text-sm font-medium text-gray-800">
 					{format(day, "d")}
 				</span>
 				{metrics &&
@@ -72,10 +72,10 @@ export function CalendarCell({
 
 			{metrics && (
 				<div className="text-left">
-					<p className="font-bold text-gray-900">
+					<p className="font-bold text-gray-900 text-xs sm:text-base">
 						{metrics.performance.toFixed(2)}%
 					</p>
-					<p className="text-xs text-gray-500">
+					<p className="text-[10px] sm:text-xs text-gray-500">
 						{metrics.volatility.toFixed(2)}%
 					</p>
 				</div>

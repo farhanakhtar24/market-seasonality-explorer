@@ -99,7 +99,7 @@ function AggregatedViewPanel({
 
 			<Separator />
 
-			<div>
+			<div className="sm:flex sm:flex-col hidden">
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<LineChart className="h-5 w-5 text-blue-600" />
 					Daily Trends for the Period
