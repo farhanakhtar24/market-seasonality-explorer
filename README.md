@@ -2,6 +2,12 @@
 
 The Market Seasonality Explorer is an advanced financial data visualization tool built with Next.js. It provides an interactive and highly detailed calendar interface to analyze historical volatility, liquidity, and performance data for financial instruments, with a primary focus on cryptocurrency markets using the Binance API.
 
+## Live Demo
+
+The application is deployed and can be accessed at the following link:
+
+[https://market-seasonality-explorer-rho.vercel.app/](https://market-seasonality-explorer-rho.vercel.app/)
+
 ## Key Features
 
 -   **Unified Multi-Timeframe Calendar**: A single, powerful calendar component that seamlessly displays data in daily, weekly, and monthly views, allowing for both high-level and granular analysis.
@@ -73,7 +79,3 @@ Unit and integration tests for critical components and utility functions are inc
 ```bash
 npm test
 ```
-
-## Deployment
-
-The easiest way to deploy this Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
