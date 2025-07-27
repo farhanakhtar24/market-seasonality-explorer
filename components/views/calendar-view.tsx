@@ -4,10 +4,8 @@ import { format, isSameMonth } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MarketCalendar } from "@/components/market-calendar";
 import { CalendarLegend } from "@/components/calendar-legend";
-import { MarketDataPoint } from "@/types";
+import { MarketDataPoint, ViewMode } from "@/types";
 import { Button } from "@/components/ui/button";
-
-type ViewMode = "daily" | "weekly" | "monthly";
 
 interface CalendarViewProps {
 	currentDate: Date;
@@ -27,8 +25,8 @@ export function CalendarView({
 	onNext,
 }: CalendarViewProps) {
 	const CalendarHeader = () => (
-		<div className="flex justify-between items-center mb-4">
-			<h2 className="text-2xl font-semibold">
+		<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+			<h2 className="text-xl sm:text-2xl font-semibold">
 				{viewMode.charAt(0).toUpperCase() + viewMode.slice(1)} Calendar
 			</h2>
 			{viewMode === "daily" && (

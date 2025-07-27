@@ -12,8 +12,7 @@ import {
 } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Button } from "@/components/ui/button";
-
-type ViewMode = "daily" | "weekly" | "monthly";
+import { ViewMode } from "@/types";
 
 interface ControlBarProps {
 	symbol: string;
@@ -37,9 +36,9 @@ export function ControlBar({
 	isDataLoading,
 }: ControlBarProps) {
 	return (
-		<div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+		<div className="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4">
 			<Select value={symbol} onValueChange={onSymbolChange}>
-				<SelectTrigger className="w-full sm:w-[180px]">
+				<SelectTrigger className="w-full lg:w-[180px]">
 					<SelectValue placeholder="Select Instrument" />
 				</SelectTrigger>
 				<SelectContent>

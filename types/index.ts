@@ -63,3 +63,5 @@ export interface MonthlyMetric {
 }
 
 export type MarketDataPoint = DailyMetric | WeeklyMetric | MonthlyMetric;
+
+export type ViewMode = "daily" | "weekly" | "monthly";

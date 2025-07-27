@@ -19,9 +19,8 @@ import {
 	DailyMetric,
 	WeeklyMetric,
 	MonthlyMetric,
+	ViewMode,
 } from "@/types";
-
-type ViewMode = "daily" | "weekly" | "monthly";
 
 interface MarketCalendarProps {
 	currentDate: Date;
@@ -101,13 +100,14 @@ export function MarketCalendar({
 
 	const renderDailyView = () => {
 		// const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+		const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
 		const longWeekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 		return (
 			<>
 				<div className="grid grid-cols-7 gap-1">
-					{longWeekdays.map((day, i) => (
+					{weekdays.map((day, i) => (
 						<div
-							key={day}
+							key={i}
 							className="text-center font-medium text-sm text-muted-foreground pb-2">
 							<span className="sm:hidden">{day}</span>
 							<span className="hidden sm:inline">

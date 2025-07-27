@@ -7,13 +7,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { unparse } from "papaparse";
 import { useMarketData } from "@/hooks/use-market-data";
 import { DashboardPanel } from "@/components/dashboard-panel";
-import { MarketDataPoint } from "@/types";
+import { MarketDataPoint, ViewMode } from "@/types";
 import { ControlBar } from "./control-bar";
 import { CalendarView } from "./calendar-view";
 import { PriceTrendChart } from "@/components/charts/price-trend-chart";
 import { LiquidityChart } from "@/components/charts/liquidity-chart";
-
-type ViewMode = "daily" | "weekly" | "monthly";
 
 type FormattedMarketDataPoint = {
 	[K in keyof MarketDataPoint]: MarketDataPoint[K] extends number
@@ -131,9 +129,9 @@ export default function HomePage() {
 
 	return (
 		<div className="bg-gray-50 min-h-screen">
-			<main className="container mx-auto p-4 sm:p-8">
+			<main className="container mx-auto p-4 sm:p-6 lg:p-8">
 				<div className="text-center mb-4">
-					<h1 className="text-4xl font-bold tracking-tight">
+					<h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
 						Market Seasonality Explorer
 					</h1>
 				</div>

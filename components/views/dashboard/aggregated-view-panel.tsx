@@ -73,13 +73,13 @@ export function AggregatedViewPanel({
 
 			<Separator />
 
-			<div className="sm:flex sm:flex-col hidden">
+			<div>
 				<h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
 					<LineChart className="h-5 w-5 text-blue-600" />
 					Daily Trends for the Period
 				</h3>
 				{chartData.length > 0 ? (
-					<div className="grid gap-6 md:grid-cols-1">
+					<div className="grid gap-6 grid-cols-1">
 						<PriceTrendChart
 							chartData={chartData}
 							symbol={symbol}
