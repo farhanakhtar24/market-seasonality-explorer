@@ -10,6 +10,8 @@ import { DashboardPanel } from "@/components/dashboard-panel";
 import { MarketDataPoint } from "@/types";
 import { ControlBar } from "./control-bar";
 import { CalendarView } from "./calendar-view";
+import { PriceTrendChart } from "@/components/charts/price-trend-chart";
+import { LiquidityChart } from "@/components/charts/liquidity-chart";
 
 type ViewMode = "daily" | "weekly" | "monthly";
 
@@ -160,14 +162,43 @@ export default function HomePage() {
 					)}
 
 					{marketDataMap && !isLoading && (
-						<CalendarView
-							currentDate={currentDate}
-							viewMode={viewMode}
-							dataMap={marketDataMap}
-							onDataPointClick={handleDataPointClick}
-							onPrev={handlePrev}
-							onNext={handleNext}
-						/>
+						<>
+							<CalendarView
+								currentDate={currentDate}
+								viewMode={viewMode}
+								dataMap={marketDataMap}
+								onDataPointClick={handleDataPointClick}
+								onPrev={handlePrev}
+								onNext={handleNext}
+							/>
+							<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+								<PriceTrendChart
+									chartData={Array.from(
+										marketDataMap.values()
+									)}
+									symbol={symbol}
+									handleChartClick={(e) => {
+										if (e?.activePayload?.[0]?.payload) {
+											handleDataPointClick(
+												e.activePayload[0].payload
+											);
+										}
+									}}
+								/>
+								<LiquidityChart
+									chartData={Array.from(
+										marketDataMap.values()
+									)}
+									handleChartClick={(e) => {
+										if (e?.activePayload?.[0]?.payload) {
+											handleDataPointClick(
+												e.activePayload[0].payload
+											);
+										}
+									}}
+								/>
+							</div>
+						</>
 					)}
 				</div>
 

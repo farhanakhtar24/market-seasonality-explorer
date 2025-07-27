@@ -19,6 +19,7 @@ export function processKlines(
 	interval: string
 ): Map<string, MarketDataPoint> {
 	const metricsMap = new Map<string, MarketDataPoint>();
+	const dailyMetricsForAggregation: DailyMetric[] = [];
 
 	for (const kline of klines) {
 		const openTime = new Date(kline[0]);
@@ -33,70 +34,126 @@ export function processKlines(
 		const volatility = ((high - low) / open) * 100;
 		const liquidity = volume * close;
 
-		let key: string;
-		let dataPoint: MarketDataPoint;
+		const dailyMetric: DailyMetric = {
+			type: "daily",
+			date: format(openTime, "dd/MM/yyyy"),
+			open,
+			high,
+			low,
+			close,
+			volume,
+			trades,
+			performance,
+			volatility,
+			liquidity,
+		};
 
-		switch (interval) {
-			case "1w": {
-				const weekNumber = getWeek(openTime);
-				key = `${format(openTime, "yyyy")}-${weekNumber}`;
-				dataPoint = {
+		if (interval === "1d") {
+			metricsMap.set(dailyMetric.date, dailyMetric);
+		} else {
+			dailyMetricsForAggregation.push(dailyMetric);
+		}
+	}
+
+	if (interval === "1w") {
+		for (const dailyMetric of dailyMetricsForAggregation) {
+			const openTime = new Date(
+				dailyMetric.date.split("/").reverse().join("-")
+			);
+			const weekNumber = getWeek(openTime);
+			const key = `${format(openTime, "yyyy")}-${weekNumber}`;
+
+			let weeklyMetric = metricsMap.get(key) as WeeklyMetric | undefined;
+
+			if (!weeklyMetric) {
+				weeklyMetric = {
 					type: "weekly",
 					date: key,
 					startDate: startOfWeek(openTime),
 					endDate: endOfWeek(openTime),
-					open,
-					high,
-					low,
-					close,
-					volume,
-					trades,
-					performance,
-					volatility,
-					liquidity,
+					open: dailyMetric.open,
+					high: dailyMetric.high,
+					low: dailyMetric.low,
+					close: dailyMetric.close,
+					volume: 0,
+					trades: 0,
+					performance: 0,
+					volatility: 0,
+					liquidity: 0,
 					days: [],
-				} as WeeklyMetric;
-				break;
+				};
+				metricsMap.set(key, weeklyMetric);
 			}
-			case "1M": {
-				key = format(openTime, "yyyy-MM");
-				dataPoint = {
+
+			weeklyMetric.high = Math.max(weeklyMetric.high, dailyMetric.high);
+			weeklyMetric.low = Math.min(weeklyMetric.low, dailyMetric.low);
+			weeklyMetric.close = dailyMetric.close;
+			weeklyMetric.volume += dailyMetric.volume;
+			weeklyMetric.trades += dailyMetric.trades;
+			weeklyMetric.liquidity += dailyMetric.liquidity;
+			weeklyMetric.days.push(dailyMetric);
+		}
+		for (const metric of metricsMap.values()) {
+			const weeklyMetric = metric as WeeklyMetric;
+			weeklyMetric.performance =
+				((weeklyMetric.close - weeklyMetric.open) / weeklyMetric.open) *
+				100;
+			weeklyMetric.volatility =
+				((weeklyMetric.high - weeklyMetric.low) / weeklyMetric.open) *
+				100;
+		}
+	}
+
+	if (interval === "1M") {
+		for (const dailyMetric of dailyMetricsForAggregation) {
+			const openTime = new Date(
+				dailyMetric.date.split("/").reverse().join("-")
+			);
+			const key = format(openTime, "yyyy-MM");
+
+			let monthlyMetric = metricsMap.get(key) as
+				| MonthlyMetric
+				| undefined;
+
+			if (!monthlyMetric) {
+				monthlyMetric = {
 					type: "monthly",
 					date: key,
 					startDate: startOfMonth(openTime),
 					endDate: endOfMonth(openTime),
-					open,
-					high,
-					low,
-					close,
-					volume,
-					trades,
-					performance,
-					volatility,
-					liquidity,
+					open: dailyMetric.open,
+					high: dailyMetric.high,
+					low: dailyMetric.low,
+					close: dailyMetric.close,
+					volume: 0,
+					trades: 0,
+					performance: 0,
+					volatility: 0,
+					liquidity: 0,
 					days: [],
-				} as MonthlyMetric;
-				break;
+				};
+				metricsMap.set(key, monthlyMetric);
 			}
-			default: {
-				key = format(openTime, "dd/MM/yyyy");
-				dataPoint = {
-					type: "daily",
-					date: key,
-					open,
-					high,
-					low,
-					close,
-					volume,
-					trades,
-					performance,
-					volatility,
-					liquidity,
-				} as DailyMetric;
-				break;
-			}
+
+			monthlyMetric.high = Math.max(monthlyMetric.high, dailyMetric.high);
+			monthlyMetric.low = Math.min(monthlyMetric.low, dailyMetric.low);
+			monthlyMetric.close = dailyMetric.close;
+			monthlyMetric.volume += dailyMetric.volume;
+			monthlyMetric.trades += dailyMetric.trades;
+			monthlyMetric.liquidity += dailyMetric.liquidity;
+			monthlyMetric.days.push(dailyMetric);
 		}
-		metricsMap.set(key, dataPoint);
+		for (const metric of metricsMap.values()) {
+			const monthlyMetric = metric as MonthlyMetric;
+			monthlyMetric.performance =
+				((monthlyMetric.close - monthlyMetric.open) /
+					monthlyMetric.open) *
+				100;
+			monthlyMetric.volatility =
+				((monthlyMetric.high - monthlyMetric.low) /
+					monthlyMetric.open) *
+				100;
+		}
 	}
 
 	if (interval === "1d") {

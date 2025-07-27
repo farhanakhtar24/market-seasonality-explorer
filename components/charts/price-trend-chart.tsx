@@ -16,13 +16,13 @@ import {
 	Area,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { DailyMetric } from "@/types";
+import { MarketDataPoint } from "@/types";
 
 interface PriceTrendChartProps {
-	chartData: DailyMetric[];
+	chartData: MarketDataPoint[];
 	symbol: string;
 	handleChartClick: (
-		e: { activePayload?: { payload: DailyMetric }[] } | null
+		e: { activePayload?: { payload: MarketDataPoint }[] } | null
 	) => void;
 }
 
@@ -86,7 +86,7 @@ export function PriceTrendChart({
 						/>
 						<Area
 							type="monotone"
-							dataKey="Price"
+							dataKey="close"
 							stroke="#16a34a"
 							fillOpacity={1}
 							fill="url(#colorPrice)"

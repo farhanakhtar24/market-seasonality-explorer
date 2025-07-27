@@ -18,12 +18,12 @@ import {
 	Legend,
 } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { DailyMetric } from "@/types";
+import { MarketDataPoint } from "@/types";
 
 interface LiquidityChartProps {
-	chartData: DailyMetric[];
+	chartData: MarketDataPoint[];
 	handleChartClick: (
-		e: { activePayload?: { payload: DailyMetric }[] } | null
+		e: { activePayload?: { payload: MarketDataPoint }[] } | null
 	) => void;
 }
 
@@ -82,18 +82,21 @@ export function LiquidityChart({
 						/>
 						<Tooltip
 							formatter={(value: number, name: string) => {
-								if (name === "Liquidity") {
+								if (name === "liquidity") {
 									return formatCurrency(value);
 								}
-								return value.toLocaleString();
+								if (name === "volume") {
+									return value.toLocaleString();
+								}
+								return value;
 							}}
 						/>
 						<Legend verticalAlign="top" height={36} />
-						<Bar yAxisId="left" dataKey="Volume" fill="#3b82f6" />
+						<Bar yAxisId="left" dataKey="volume" fill="#3b82f6" />
 						<Line
 							yAxisId="right"
 							type="monotone"
-							dataKey="Liquidity"
+							dataKey="liquidity"
 							stroke="#f97316"
 							strokeWidth={2}
 							dot={false}
