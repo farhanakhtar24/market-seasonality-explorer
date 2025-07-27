@@ -1,34 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-	subMonths,
-	format,
-	subDays,
-	addMonths,
-	isSameMonth,
-	isFuture,
-} from "date-fns";
+import { subMonths, format, subDays, addMonths, isFuture } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { unparse } from "papaparse";
 import { useMarketData } from "@/hooks/use-market-data";
 import { DashboardPanel } from "@/components/dashboard-panel";
-import { MarketCalendar } from "@/components/market-calendar";
-import { CalendarLegend } from "@/components/calendar-legend";
 import { MarketDataPoint } from "@/types";
-import { Button } from "@/components/ui/button";
+import { ControlBar } from "./control-bar";
+import { CalendarView } from "./calendar-view";
 
 type ViewMode = "daily" | "weekly" | "monthly";
+
+type FormattedMarketDataPoint = {
+	[K in keyof MarketDataPoint]: MarketDataPoint[K] extends number
+		? string
+		: MarketDataPoint[K];
+};
 
 export default function HomePage() {
 	const router = useRouter();
@@ -95,30 +84,48 @@ export default function HomePage() {
 		});
 	};
 
-	const CalendarHeader = () => (
-		<div className="flex justify-between items-center mb-4">
-			<h2 className="text-2xl font-semibold">
-				{viewMode.charAt(0).toUpperCase() + viewMode.slice(1)} Calendar
-			</h2>
-			{viewMode === "daily" && (
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium">
-						{format(currentDate, "MMMM yyyy")}
-					</span>
-					<Button variant="outline" size="icon" onClick={handlePrev}>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<Button
-						variant="outline"
-						size="icon"
-						onClick={handleNext}
-						disabled={isSameMonth(currentDate, new Date())}>
-						<ChevronRight className="h-4 w-4" />
-					</Button>
-				</div>
-			)}
-		</div>
-	);
+	const handleExportCSV = () => {
+		if (!marketDataMap) return;
+
+		const data = Array.from(marketDataMap.values());
+		const processedData = data.map((row: MarketDataPoint) => {
+			const newRow: Partial<FormattedMarketDataPoint> = {};
+			for (const key in row) {
+				const typedKey = key as keyof MarketDataPoint;
+				const value = row[typedKey];
+
+				if (viewMode !== "daily" && key === "days") {
+					continue;
+				}
+
+				if (typeof value === "number") {
+					(newRow[typedKey] as string) = new Intl.NumberFormat(
+						"en-US",
+						{
+							minimumFractionDigits: 2,
+							maximumFractionDigits: 2,
+						}
+					).format(value);
+				} else {
+					(newRow[typedKey] as string) = value as string;
+				}
+			}
+			return newRow;
+		});
+		const csv = unparse(processedData);
+		const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+		const link = document.createElement("a");
+		const url = URL.createObjectURL(blob);
+		link.setAttribute("href", url);
+		link.setAttribute(
+			"download",
+			`${symbol}_${viewMode}_${date?.from?.toISOString()}-${date?.to?.toISOString()}.csv`
+		);
+		link.style.visibility = "hidden";
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	};
 
 	return (
 		<div className="bg-gray-50 min-h-screen">
@@ -129,41 +136,16 @@ export default function HomePage() {
 					</h1>
 				</div>
 
-				<div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-					<Select value={symbol} onValueChange={setSymbol}>
-						<SelectTrigger className="w-full sm:w-[180px]">
-							<SelectValue placeholder="Select Instrument" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="BTCUSDT">BTC/USDT</SelectItem>
-							<SelectItem value="ETHUSDT">ETH/USDT</SelectItem>
-							<SelectItem value="XRPUSDT">XRP/USDT</SelectItem>
-							<SelectItem value="BNBUSDT">BNB/USDT</SelectItem>
-							<SelectItem value="SOLUSDT">SOL/USDT</SelectItem>
-							<SelectItem value="USDCUSDT">USDC/USDT</SelectItem>
-							<SelectItem value="DOGEUSDT">DOGE/USDT</SelectItem>
-						</SelectContent>
-					</Select>
-
-					<DateRangePicker
-						date={date}
-						onDateChange={setDate}
-						toDate={new Date()}
-					/>
-
-					<ToggleGroup
-						type="single"
-						value={viewMode}
-						onValueChange={(v: ViewMode) => {
-							if (v) setViewMode(v);
-						}}>
-						<ToggleGroupItem value="daily">Daily</ToggleGroupItem>
-						<ToggleGroupItem value="weekly">Weekly</ToggleGroupItem>
-						<ToggleGroupItem value="monthly">
-							Monthly
-						</ToggleGroupItem>
-					</ToggleGroup>
-				</div>
+				<ControlBar
+					symbol={symbol}
+					onSymbolChange={setSymbol}
+					date={date}
+					onDateChange={setDate}
+					viewMode={viewMode}
+					onViewModeChange={setViewMode}
+					onExport={handleExportCSV}
+					isDataLoading={isLoading}
+				/>
 
 				<div className="min-h-[500px]">
 					{isLoading && (
@@ -178,16 +160,14 @@ export default function HomePage() {
 					)}
 
 					{marketDataMap && !isLoading && (
-						<div>
-							<CalendarHeader />
-							<MarketCalendar
-								currentDate={currentDate}
-								viewMode={viewMode}
-								dataMap={marketDataMap}
-								onDataPointClick={handleDataPointClick}
-							/>
-							<CalendarLegend />
-						</div>
+						<CalendarView
+							currentDate={currentDate}
+							viewMode={viewMode}
+							dataMap={marketDataMap}
+							onDataPointClick={handleDataPointClick}
+							onPrev={handlePrev}
+							onNext={handleNext}
+						/>
 					)}
 				</div>
 
