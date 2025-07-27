@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { DailyMetric } from "@/types";
+import { DailyMetric, MarketDataPoint } from "@/types";
 import { PriceTrendChart } from "./charts/price-trend-chart";
 import { LiquidityChart } from "./charts/liquidity-chart";
 import { MainDashboard } from "./views/main-dashboard";
@@ -69,10 +69,13 @@ export function DashboardView({
 	}));
 
 	const handleChartClick = (
-		e: { activePayload?: { payload: DailyMetric }[] } | null
+		e: { activePayload?: { payload: MarketDataPoint }[] } | null
 	) => {
 		if (e?.activePayload?.[0]) {
-			onDataPointClick(e.activePayload[0].payload);
+			const point = e.activePayload[0].payload;
+			if (point.type === "daily") {
+				onDataPointClick(point);
+			}
 		}
 	};
 

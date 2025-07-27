@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import HomePage from "./page";
 import { useMarketData } from "@/hooks/use-market-data";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock the custom hook
 jest.mock("@/hooks/use-market-data");
@@ -23,6 +24,23 @@ jest.mock("@/components/market-calendar", () => ({
 }));
 
 describe("app/page.tsx", () => {
+	const createWrapper = () => {
+		const queryClient = new QueryClient({
+			defaultOptions: {
+				queries: {
+					retry: false,
+				},
+			},
+		});
+		const wrapper = ({ children }: { children: React.ReactNode }) => (
+			<QueryClientProvider client={queryClient}>
+				{children}
+			</QueryClientProvider>
+		);
+		wrapper.displayName = "QueryClientWrapper";
+		return wrapper;
+	};
+
 	beforeEach(() => {
 		// Reset mocks before each test
 		mockedUseMarketData.mockClear();
@@ -35,7 +53,7 @@ describe("app/page.tsx", () => {
 			data: null,
 		});
 
-		render(<HomePage />);
+		render(<HomePage />, { wrapper: createWrapper() });
 
 		expect(
 			screen.getByRole("heading", {
@@ -52,7 +70,7 @@ describe("app/page.tsx", () => {
 			data: new Map(), // Provide some mock data
 		});
 
-		render(<HomePage />);
+		render(<HomePage />, { wrapper: createWrapper() });
 
 		expect(screen.getByTestId("market-calendar")).toBeInTheDocument();
 	});
@@ -65,7 +83,7 @@ describe("app/page.tsx", () => {
 			data: null,
 		});
 
-		render(<HomePage />);
+		render(<HomePage />, { wrapper: createWrapper() });
 
 		expect(screen.getByText(/Error: Failed to fetch/i)).toBeInTheDocument();
 	});
@@ -79,7 +97,7 @@ describe("app/page.tsx", () => {
 			data: new Map(),
 		});
 
-		render(<HomePage />);
+		render(<HomePage />, { wrapper: createWrapper() });
 
 		// The hook is called with '1d' on initial render
 		expect(mockedUseMarketData).toHaveBeenCalledWith(

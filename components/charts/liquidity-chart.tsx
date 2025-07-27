@@ -49,7 +49,8 @@ export function LiquidityChart({
 							left: 30,
 							bottom: 50,
 						}}
-						onClick={handleChartClick}>
+						onClick={handleChartClick}
+						data-testid="liquidity-chart">
 						<XAxis
 							dataKey="date"
 							fontSize={12}

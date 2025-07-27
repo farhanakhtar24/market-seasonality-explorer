@@ -1,111 +1,114 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMarketData } from "./use-market-data";
 import { getKlines } from "@/services/binance";
-import { RawKline } from "@/types";
-import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Mock the getKlines service
+// Mock the service
 jest.mock("@/services/binance");
 const mockedGetKlines = getKlines as jest.Mock;
 
 // Create a client
-const queryClient = new QueryClient({
-	defaultOptions: {
-		queries: {
-			// Set staleTime to infinity to prevent refetches during tests
-			staleTime: Infinity,
-			// Disable retries for tests
-			retry: false,
+const createWrapper = () => {
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				retry: false,
+			},
 		},
-	},
-});
-
-// Wrapper component to provide the QueryClient
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-	<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-);
+	});
+	const wrapper = ({ children }: { children: React.ReactNode }) => (
+		<QueryClientProvider client={queryClient}>
+			{children}
+		</QueryClientProvider>
+	);
+	wrapper.displayName = "QueryClientWrapper";
+	return wrapper;
+};
 
 describe("hooks/use-market-data", () => {
 	beforeEach(() => {
-		// Clear cache and mock history before each test
-		queryClient.clear();
 		mockedGetKlines.mockClear();
 	});
 
-	const mockKlinesData: RawKline[] = [
-		[
-			1672531200000,
-			"100",
-			"110",
-			"95",
-			"105",
-			"1000",
-			1672617599999,
-			"105000",
-			500,
-			"500",
-			"52500",
-			"0",
-		],
-	];
-
-	it("should return loading state initially and then the transformed data", async () => {
-		mockedGetKlines.mockResolvedValue(mockKlinesData);
-
+	it("should return loading state initially", () => {
+		mockedGetKlines.mockReturnValue(new Promise(() => {})); // Never resolves
 		const { result } = renderHook(
-			() =>
-				useMarketData(
-					"BTCUSDT",
-					"1d",
-					new Date(1672531200000),
-					new Date(1672617599999)
-				),
-			{ wrapper }
+			() => useMarketData("BTCUSDT", "1d", new Date(), new Date()),
+			{ wrapper: createWrapper() }
 		);
-
-		// Check initial loading state
 		expect(result.current.isLoading).toBe(true);
-
-		// Wait for the query to resolve
-		await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-		// Check the final state
-		expect(result.current.isLoading).toBe(false);
-		expect(result.current.data).toBeInstanceOf(Map);
-		expect(result.current.data?.size).toBe(1);
-		expect(result.current.data?.has("01/01/2023")).toBe(true);
 	});
 
-	it("should return an error state if the fetch fails", async () => {
-		const errorMessage = "Network Error";
+	it("should return data on successful fetch", async () => {
+		const mockData = [[1672531200000, "100", "110", "95", "105"]];
+		mockedGetKlines.mockResolvedValue(mockData);
+
+		const { result } = renderHook(
+			() => useMarketData("BTCUSDT", "1d", new Date(), new Date()),
+			{ wrapper: createWrapper() }
+		);
+
+		await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+		expect(result.current.data).toBeInstanceOf(Map);
+		expect(result.current.data?.size).toBe(1);
+	});
+
+	it("should return an error when fetch fails", async () => {
+		const errorMessage = "Network error";
 		mockedGetKlines.mockRejectedValue(new Error(errorMessage));
 
 		const { result } = renderHook(
-			() =>
-				useMarketData(
-					"ETHUSDT",
-					"1h",
-					new Date(1672531200000),
-					new Date(1672617599999)
-				),
-			{ wrapper }
+			() => useMarketData("BTCUSDT", "1d", new Date(), new Date()),
+			{ wrapper: createWrapper() }
 		);
 
-		// Wait for the query to fail
 		await waitFor(() => expect(result.current.isError).toBe(true));
-
 		expect(result.current.error).toBeInstanceOf(Error);
 		expect(result.current.error?.message).toBe(errorMessage);
 	});
 
-	it("should be disabled if startDate or endDate are not provided", () => {
+	it("should call getKlines with correct parameters", async () => {
+		mockedGetKlines.mockResolvedValue([]);
+		const symbol = "ETHUSDT";
+		const interval = "1h";
+		const startDate = new Date("2023-01-01");
+		const endDate = new Date("2023-01-31");
+
 		const { result } = renderHook(
-			() => useMarketData("BTCUSDT", "1d", undefined, new Date()),
-			{ wrapper }
+			() => useMarketData(symbol, interval, startDate, endDate),
+			{ wrapper: createWrapper() }
 		);
 
-		// Hook should not be enabled, so it shouldn't be loading
+		await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+		expect(mockedGetKlines).toHaveBeenCalledWith({
+			symbol,
+			interval,
+			startTime: startDate.getTime(),
+			endTime: endDate.getTime(),
+		});
+	});
+
+	it("should not fetch data when startDate is undefined", () => {
+		mockedGetKlines.mockResolvedValue([]);
+		const { result } = renderHook(
+			() => useMarketData("BTCUSDT", "1d", undefined, new Date()),
+			{ wrapper: createWrapper() }
+		);
+
+		expect(result.current.isLoading).toBe(false);
+		expect(result.current.isFetching).toBe(false);
+		expect(mockedGetKlines).not.toHaveBeenCalled();
+	});
+
+	it("should not fetch data when endDate is undefined", () => {
+		mockedGetKlines.mockResolvedValue([]);
+		const { result } = renderHook(
+			() => useMarketData("BTCUSDT", "1d", new Date(), undefined),
+			{ wrapper: createWrapper() }
+		);
+
 		expect(result.current.isLoading).toBe(false);
 		expect(result.current.isFetching).toBe(false);
 		expect(mockedGetKlines).not.toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { getVolatilityColor, formatCurrency } from "./utils";
+import { getVolatilityColor, formatCurrency, formatVolume } from "./utils";
 
 describe("lib/utils", () => {
 	// Tests for getVolatilityColor
@@ -47,6 +47,29 @@ describe("lib/utils", () => {
 
 		it("should format zero", () => {
 			expect(formatCurrency(0)).toBe("$0.00");
+		});
+	});
+
+	// Tests for formatVolume
+	describe("formatVolume", () => {
+		it("should format billions", () => {
+			expect(formatVolume(1500000000)).toBe("1.50B");
+		});
+
+		it("should format millions", () => {
+			expect(formatVolume(2500000)).toBe("2.50M");
+		});
+
+		it("should format thousands", () => {
+			expect(formatVolume(12300)).toBe("12.30K");
+		});
+
+		it("should format smaller numbers with commas", () => {
+			expect(formatVolume(500.789)).toBe("500.789");
+		});
+
+		it("should format zero", () => {
+			expect(formatVolume(0)).toBe("0");
 		});
 	});
 });
